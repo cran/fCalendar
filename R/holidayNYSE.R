@@ -15,10 +15,10 @@
 # MA  02111-1307  USA
 
 # Copyrights (C)
-# for this R-port:
-#   1999 - 2008, Diethelm Wuertz, Rmetrics Foundation, GPL
-#   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
-#   info@rmetrics.org
+# for this R-port: 
+#   1999 - Diethelm Wuertz, GPL
+#   2007 - Rmetrics Foundation, GPL
+#   Diethelm Wuertz <wuertz@phys.ethz.ch>
 #   www.rmetrics.org
 # for the code accessed (or partly included) from other R-ports:
 #   see R's copyright and license files
@@ -28,14 +28,15 @@
 
 
 ################################################################################
-# FUNCTION:                 HOLIDAY CALENDAR FUNCTIONS:
+# FUNCTION:                 DESCRIPTION:
 #  holidayNYSE               Returns holidays for full-day NYSE calendar
 ################################################################################
 
 
 holidayNYSE <-
     function(year = currentYear)
-{   # A function implemented by Diethelm Wuertz
+{   
+    # A function implemented by Diethelm Wuertz
 
     # Description:
     #   Returns 'timeDate' object for full-day NYSE holidays
@@ -58,9 +59,6 @@ holidayNYSE <-
     #   [1] "America/New_York"
     #   [1] [2004-01-01] [2004-01-19] [2004-02-16] [2004-04-09]
     #   [5] [2004-05-31] [2004-07-05] [2004-09-06] [2004-11-25]
-
-    # Changes:
-    #
 
     # FUNCTION:
 
@@ -115,25 +113,22 @@ holidayNYSE <-
     y <- posix$year + 1900
     m <- posix$mon + 1
     lastday <- as.POSIXlt((timeCalendar(y = y+(m+1)%/%13,
-                                        m = m+1-(m+1)%/%13*12,
-                                        d = 1)
-                           - 24*3600)@Data)$mday
+        m = m+1-(m+1)%/%13*12, d = 1) - 24*3600)@Data)$mday
     ExceptOnLastFriday <- timeDate(as.character(.last.of.nday(year = y,
-                                                              month = m,
-                                                              lastday = lastday,
-                                                              nday = 5)))
+        month = m, lastday = lastday, nday = 5)))
     ans <- ans - as.integer(ans >= timeDate("1959-07-03") &
-                            as.POSIXlt(ans@Data)$wday == 6  &
-                            (ans - 24*3600) != ExceptOnLastFriday ) * 24 * 3600
+        as.POSIXlt(ans@Data)$wday == 6  &
+        (ans - 24*3600) != ExceptOnLastFriday ) * 24 * 3600
 
     # Remove Remaining Weekend Dates:
     ans <- ans[ !(as.POSIXlt(ans@Data)$wday == 0 |
-                  as.POSIXlt(ans@Data)$wday == 6)]
+        as.POSIXlt(ans@Data)$wday == 6)]
     ans@FinCenter <- "NewYork"
 
     # Return Value:
     ans
 }
+
 
 ################################################################################
 

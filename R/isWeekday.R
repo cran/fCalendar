@@ -16,9 +16,9 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2008, Diethelm Wuertz, Rmetrics Foundation, GPL
-#   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
-#   info@rmetrics.org
+#   1999 - Diethelm Wuertz, GPL
+#   2007 - Rmetrics Foundation, GPL
+#   Diethelm Wuertz <wuertz@phys.ethz.ch>
 #   www.rmetrics.org
 # for the code accessed (or partly included) from other R-ports:
 #   see R's copyright and license files
@@ -28,11 +28,9 @@
 
 
 ################################################################################
-# METHODS:                  TEST AND REPRESENTATION OF OBJECTS:
+# METHODS:                  DESCRIPTION:
 #  isWeekday                 Tests if a date is a weekday or not
 #  isWeekend                 Tests if a date falls on a weekend or not
-#  isBizday                  Tests if a date is a business day or not
-#  isHoliday                 Tests if a date is a non-business day or not
 ################################################################################
 
 

@@ -6,19 +6,19 @@
 #
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU Library General Public License for more details.
 #
-# You should have received a copy of the GNU Library General 
-# Public License along with this library; if not, write to the 
-# Free Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
+# You should have received a copy of the GNU Library General
+# Public License along with this library; if not, write to the
+# Free Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 # MA  02111-1307  USA
 
 # Copyrights (C)
-# for this R-port: 
-#   1999 - 2008, Diethelm Wuertz, Rmetrics Foundation, GPL
-#   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
-#   info@rmetrics.org
+# for this R-port:
+#   1999 - Diethelm Wuertz, GPL
+#   2007 - Rmetrics Foundation, GPL
+#   Diethelm Wuertz <wuertz@phys.ethz.ch>
 #   www.rmetrics.org
 # for the code accessed (or partly included) from other R-ports:
 #   see R's copyright and license files
@@ -36,8 +36,8 @@
 ################################################################################
 
 
-as.timeDate = 
-function(x, zone = NULL, FinCenter = NULL) 
+as.timeDate <-
+    function(x, zone = NULL, FinCenter = NULL)
 {
     UseMethod("as.timeDate")
 }
@@ -46,25 +46,56 @@ function(x, zone = NULL, FinCenter = NULL)
 # ------------------------------------------------------------------------------
 
 
-as.timeDate.default = 
-function(x, zone = myFinCenter, FinCenter = myFinCenter) 
-{   # A function implemented by Diethelm Wuertz
+as.timeDate.default <-
+    function(x, zone = myFinCenter, FinCenter = myFinCenter)
+{
+    # A function implemented by Diethelm Wuertz
 
     # Description:
     #   Returns default object as 'timeDate' object
-    
+
     # Arguments:
     #   x - a 'timeDate' object
-    
+
     # Value:
-    #   Returns 'x' as a 'timeDate' object. 
-    
+    #   Returns 'x' as a 'timeDate' object.
+
     # FUNCTION:
-    
+
     # as timeDate:
-    ans = timeDate(charvec = as.character(x), 
+    ans = timeDate(charvec = as.character(x),
         zone = zone, FinCenter = FinCenter)
-    
+
+    # Return Value:
+    ans
+}
+
+
+# ------------------------------------------------------------------------------
+
+as.timeDate.timeDate <-
+    function(x, zone = x@FinCenter, FinCenter = myFinCenter)
+{
+    # A function implemented by Diethelm Wuertz
+
+    # Description:
+    #   Returns default object as 'timeDate' object
+
+    # Arguments:
+    #   x - a 'timeDate' object
+
+    # Value:
+    #   Returns 'x' as a 'timeDate' object.
+
+    # FUNCTION:
+    stopifnot(class(x) == "timeDate")
+    if (zone != x@FinCenter)
+        warning("argument zone is ignored and FinCenter\n of timeDate is used as zone")
+
+    # as timeDate:
+    ans = timeDate(charvec = as.character(x),
+        zone = zone, FinCenter = FinCenter)
+
     # Return Value:
     ans
 }
@@ -73,24 +104,25 @@ function(x, zone = myFinCenter, FinCenter = myFinCenter)
 # ------------------------------------------------------------------------------
 
 
-as.timeDate.POSIXt = 
-function(x, zone = myFinCenter, FinCenter = myFinCenter) 
-{   # A function implemented by Diethelm Wuertz
+as.timeDate.POSIXt <-
+    function(x, zone = myFinCenter, FinCenter = myFinCenter)
+{
+    # A function implemented by Diethelm Wuertz
 
     # Description:
     #   Returns a 'POSIXt' object as 'timeDate' object
-    
+
     # Arguments:
     #   x - a 'timeDate' object
-    
+
     # Value:
-    #   Returns 'x' as a 'timeDate' object. 
-    
+    #   Returns 'x' as a 'timeDate' object.
+
     # FUNCTION:
-    
+
     # as timeDate:
     ans = timeDate(charvec = x, zone = zone, FinCenter = FinCenter)
-    
+
     # Return Value:
     ans
 }
@@ -99,30 +131,31 @@ function(x, zone = myFinCenter, FinCenter = myFinCenter)
 # ------------------------------------------------------------------------------
 
 
- 
-as.timeDate.Date = 
-function(x, zone = myFinCenter, FinCenter = myFinCenter) 
-{   # A function implemented by Diethelm Wuertz
+
+as.timeDate.Date <-
+    function(x, zone = myFinCenter, FinCenter = myFinCenter)
+{
+    # A function implemented by Diethelm Wuertz
 
     # Description:
     #   Returns a 'Date' object as 'timeDate' object
-    
+
     # Arguments:
     #   x - a 'timeDate' object
     #   ... - arguments passed to other methods.
-    
+
     # Value:
-    #   Returns 'x' as a character vector. 
-    
+    #   Returns 'x' as a character vector.
+
     # FUNCTION:
-    
+
     # as timeDate:
     ans = timeDate(charvec = x, zone = zone, FinCenter = FinCenter)
-    
+
     # Return Value:
     ans
 }
-    
+
 
 ################################################################################
 
