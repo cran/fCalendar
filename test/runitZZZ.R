@@ -1,13 +1,4 @@
 
-#*******************************************************************************
-# fCalendar - A SOFTWARE COLLECTION FOR FINANCIAL ENGINEERS
-# Time, Date and Calendar Tools
-#
-# collected by Diethelm Wuertz
-# Version 0.9
-#*******************************************************************************
-
-
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
 # License as published by the Free Software Foundation; either
@@ -18,14 +9,14 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
 # GNU Library General Public License for more details.
 #
-# You should have received a copy of the GNU Library General 
+# You should have received A copy of the GNU Library General 
 # Public License along with this library; if not, write to the 
 # Free Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
 # MA  02111-1307  USA
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2005, Diethelm Wuertz, GPL
+#   1999 - 2006, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -33,24 +24,34 @@
 #   see R's copyright and license files
 # for the code accessed (or partly included) from contributed R-ports
 # and other sources
-#   see Rmetrics's copyright file  
+#   see Rmetrics's copyright file
 
 
 ################################################################################
- 
-    
-.First.lib =  
-function(lib, pkg)
-{   # A function implemented by Diethelm Wuertz
-    
-    # Package:
-    cat("\nRmetrics, (C) 1999-2006, Diethelm Wuertz, GPL")
-    cat("\nfCalendar: Time, Date and Calendar Tools\n")
-    
-    # Load dll:
-    # library.dynam("fCalendar", pkg, lib) 
+
+
+if (FALSE) {
+    require(fCalendar)
+    require(RUnit)
+    testIndex = c("1A", "2A", "3A", "3B", "3C", "3E", "4", "4B", "4C",
+        "4D", "5A", "5B", "6A")
+    # testIndex = c(testIndex, "Demo")
+    File = "C:/Rmetrics/SVN/trunk/fCalendar/test/runit"
+    Protocol = "runitCalendar.txt"
+    write("fCalendar:", file = Protocol)
+    for (Index in testIndex) {
+        file = paste(File, Index, ".R", sep = "")
+        write("", file = Protocol, append = TRUE)
+        testResult <- runTestFile(file)
+        textProtocol = capture.output(printTextProtocol(testResult))
+        write(textProtocol[-c(2, 6:14, 18:20)], 
+            file = Protocol, append = TRUE)
+    } 
+     
+    TXT = scan(Protocol, character(), blank.lines.skip = FALSE, sep = "\n")
+    cat(TXT, sep = "\n")
 }
 
 
-################################################################################
+# ------------------------------------------------------------------------------
 

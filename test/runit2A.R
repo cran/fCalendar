@@ -1,13 +1,4 @@
 
-#*******************************************************************************
-# fCalendar - A SOFTWARE COLLECTION FOR FINANCIAL ENGINEERS
-# Time, Date and Calendar Tools
-#
-# collected by Diethelm Wuertz
-# Version 0.9
-#*******************************************************************************
-
-
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
 # License as published by the Free Software Foundation; either
@@ -25,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2005, Diethelm Wuertz, GPL
+#   1999 - 2004, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -33,22 +24,44 @@
 #   see R's copyright and license files
 # for the code accessed (or partly included) from contributed R-ports
 # and other sources
-#   see Rmetrics's copyright file  
+#   see Rmetrics's copyright file
 
 
 ################################################################################
- 
-    
-.First.lib =  
-function(lib, pkg)
-{   # A function implemented by Diethelm Wuertz
-    
-    # Package:
-    cat("\nRmetrics, (C) 1999-2006, Diethelm Wuertz, GPL")
-    cat("\nfCalendar: Time, Date and Calendar Tools\n")
-    
-    # Load dll:
-    # library.dynam("fCalendar", pkg, lib) 
+
+
+################################################################################
+# The following DST Rules were extracted from Libical library and 
+# integrated into R functions. 
+# Libical is an Open Source implementation of the iCalendar protocols
+# and protocol data units.
+# The code and datafiles are licensed under the terms of the GNU 
+# Library General Public License. 
+################################################################################
+
+
+test.helpFile = 
+function()
+{
+    # Help File:
+    helpFile = function() { 
+        example(DaylightSavingTime); return() }
+    checkIdentical(
+        target = class(try(helpFile())),
+        current = "NULL")
+
+    # Return Value:
+    return()    
+}
+
+
+# ------------------------------------------------------------------------------
+
+
+if (FALSE) {
+    require(RUnit)
+    testResult <- runTestFile("C:/Rmetrics/SVN/trunk/fCalendar/test/runit2A.R")
+    printTextProtocol(testResult)
 }
 
 

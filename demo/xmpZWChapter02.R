@@ -1,7 +1,7 @@
 
 #
 # Example:
-# 	A Compendium for R and Rmetrics users to the book 
+#   A Compendium for R and Rmetrics users to the book 
 #     "Modeling Financial Time Series with S-Plus" 
 #     written by E. Zivot and J. Wang
 #   ISBN 0-387-95549-6
@@ -13,13 +13,13 @@
 #   This is not a COPY of the S-Plus "example.ssc" files accompanying the
 #     book of Zivot and Wang. It is worth to note that this file contents a 
 #     new implementation of the examples tailored to Rmetrics based on R.
-# 	Diethelm Wuertz
-# 	  www.rmetrics.org
-# 	  www.itp.phys.ethz.ch
-# 	  www.finance.ch
+#   Diethelm Wuertz
+#     www.rmetrics.org
+#     www.itp.phys.ethz.ch
+#     www.finance.ch
 #
 # Author:
-#	(C) 2002-2004, Diethelm Wuertz, GPL
+#   (C) 2002-2004, Diethelm Wuertz, GPL
 #
 
     
@@ -41,7 +41,7 @@
     #   and its precision, differ from that used together with the S-Plus 
     #   software in the book of Zivot and Wang.
     #   Internet download functions are available in the Rmetrics
-    #   package "fBasics". You can use them to update the data files.
+    #   package "fCalendar". You can use them to update the data files.
     # Now we show how to work out the same examples using "R" and Rmetrics".
     #   I is worth to briefly mention the basic concepts of the 'timeDate'  
     #   and 'timeSeries' classes implemented in Rmetrics:
@@ -73,22 +73,23 @@
     ###
      
     
-    # The function 'read.timeSeries' allows you to read data from a
+    # The function 'readSeries' allows you to read data from a
     # spreadsheet file and transforms it ditrectly to a 'timeSeries'
     # object.
-    args(read.timeSeries)
-    # Where are the Data?
-    dataPath = "library/fBasics/data/"
+    args(readSeries)
     ###
     
     
     # The file "singleIndex.dat.csv" contains the monthly closing 
     # prices for Microsoft Corporation and the S&P 500 index.
-    # Data are downloadable and can be updated from Yahoo's web site.
-    singleIndex.dat = read.timeSeries(
-        paste(dataPath, "singleIndex.dat.csv", sep = ""))
-    singleIndex.dat[1,]
-    end(singleIndex.dat)
+    # Download from Rmetrics Data Base:
+    URL = "http://www.itp.phys.ethz.ch/econophysics/R/data/textbooks/"
+    SRC = "ZivotWang/data/singleIndex.dat.csv"
+    DATA = paste(URL, SRC, sep = "") 
+    download.file(DATA, destfile = "singleIndex.dat.csv")
+    singleIndex.dat = readSeries("singleIndex.dat.csv")
+    print(singleIndex.dat[1,])
+    print(end(singleIndex.dat))
     ###
     
     
@@ -106,12 +107,12 @@
     # Functions:
     # Note: for positions() use: seriesPositions() to access
     #   the positions slot - the same notation as seriesData()
-    seriesPositions(singleIndex.dat)[1:5]
+    print(seriesPositions(singleIndex.dat)[1:5])
     class(seriesPositions(singleIndex.dat))
-    start(singleIndex.dat)
-    end(singleIndex.dat)
+    print(start(singleIndex.dat))
+    print(end(singleIndex.dat))
     class(end(singleIndex.dat))
-    seriesData(singleIndex.dat)[1:5,]
+    print(seriesData(singleIndex.dat)[1:5,])
     class(seriesData(singleIndex.dat))
     ###
 
@@ -138,12 +139,14 @@
     smpl = (
         seriesPositions(singleIndex.dat) >= timeDate("3/01/1992") &
         seriesPositions(singleIndex.dat) <= timeDate("1/31/1993") )
-    singleIndex.dat[smpl, ]
+    print(singleIndex.dat[smpl, ])
     class(singleIndex.dat)
     # Alternatively use in R cutSeries():
-    cutSeries(singleIndex.dat, timeDate("3/01/1992"), timeDate("1/31/1993"))
+    tS = cut(singleIndex.dat, timeDate("3/01/1992"), timeDate("1/31/1993"))
+    print(tS)
     # Or with ISO dates ...
-    cutSeries(singleIndex.dat, timeDate("1992-03-01"), timeDate("1993-01-31"))
+    tS = cut(singleIndex.dat, timeDate("1992-03-01"), timeDate("1993-01-31"))
+    print(tS)
     # Note, American and ISO format specifications are automatically recognized
     ###
     
@@ -176,14 +179,14 @@
         format = "%m/%d/%Y", 
         zone = "America/Pacific",
         FinCenter = "America/LosAngeles")
-    tdLA
+    print(tdLA)
     # Now for "GMT":
     tdGMT = timeDate(
         charvec = "1/1/2002", 
         format = "%m/%d/%Y", 
         zone = "GMT",
         FinCenter = "GMT")
-    tdGMT
+    print(tdGMT)
     ###
     
     
@@ -198,7 +201,7 @@
     # p. 20
     td = tdGMT
     class(td)
-    td
+    print(td)
     slotNames(td)
     ###
     
@@ -207,8 +210,9 @@
     # p. 20
     # > ?class.timeDate
     # in Rmetrics use:
-    help(timeDate)
-    help(timeSeries)
+    # ... please uncomment the next two lines
+    # help(timeDate)
+    # help(timeSeries)
     ###
     
     
@@ -222,19 +226,19 @@
     # ... or
     args(julian.timeDate)
     julian(td)
-    julian(td, "days")
+    julian(td, units = "days")
     # Yields: Time difference of 11688.33 days
     # From where comes 1/3 day?
     # Julians have their origin 1960-01-01 00:00:00 GMT!
     # Confirm it:
-    julian(tdGMT, "days")
+    julian(tdGMT, units = "days")
     # Test the Origin:
     tdORIGIN = timeDate(
         charvec = "1970-01-01", 
         format = "%Y-%m-%d",
         FinCenter = "GMT")
     tdORIGIN
-    julian(tdORIGIN, "days")
+    julian(tdORIGIN, units = "days")
     ###
     
     
@@ -260,13 +264,18 @@
     
     
     # Format date/time in Pacific Time Zone:
-    tdPACIFIC = timeDate("Mar 02, 1963 08:00 PM",
-        format = "%b %d, %Y %I:%M %p",
+    # tdPACIFIC = timeDate("Mar 02, 1963 08:00 PM",
+    #    format = "%b %d, %Y %H:%M %p",
+    #     zone = "America/Pacific",
+    #     FinCenter = "America/Pacific" )
+    # ... makes some problems - please  check source code
+    # Workaround:
+    tdPACIFIC = timeDate(
+        strptime("Mar 02, 1963 08:00 PM", format = "%b %d, %Y %H:%M %p"),
         zone = "America/Pacific",
         FinCenter = "America/Pacific" )
     tdPACIFIC
     ###
-    
     
     # Convert date/time to Eastern Time Zone:
     # p. 21
@@ -277,14 +286,16 @@
         format = "%Y-%m-%d",
         zone = "America/Pacific", 
         FinCenter = "America/Pacific" )
-    timeDate(
+    tD = timeDate(
         tdPST, 
         zone = "America/Pacific", 
         FinCenter = "America/NewYork" )
-    timeDate(
+    print(tD)
+    tD = timeDate(
         tdPST, 
         zone = "America/Pacific", 
         FinCenter = "America/Eastern" )
+    print(tD)
     ###
     
     
@@ -295,7 +306,7 @@
         format = "%m/%d/%Y",
         zone = "GMT",
         FinCenter = "GMT")
-    tdGMT
+    print(tdGMT)
     ###
     
     
@@ -304,7 +315,7 @@
     tdPST = timeDate(
         tdGMT, 
         FinCenter = "America/Pacific")
-    tdPST
+    print(tdPST)
     ###
     
     
@@ -315,7 +326,7 @@
         format = "%m/%d/%Y",
         zone = "America/Pacific",
         FinCenter = "America/Pacific")
-    tdPST
+    print(tdPST)
     ###
     
     
@@ -325,7 +336,7 @@
         tdPST, 
         zone = "America/Pacific", 
         FinCenter = "GMT")
-    tdGMT
+    print(tdGMT)
     ###
     
     
@@ -336,7 +347,7 @@
         tdPST, 
         zone = "America/Pacific", 
         FinCenter = "Europe/Zurich")
-    tdZUR
+    print(tdZUR)
     ###
     
 
@@ -357,9 +368,11 @@
         format = "%Y-%m-%d",
         zone = "GMT",
         FinCenter = "GMT")
-    td1; td2
+    print(td1)
+    print(td2)
     # Or shorthand ...
-    timeDate(c("2002-01-01", "2002-02-01"), FinCenter = "GMT")  
+    tD = timeDate(c("2002-01-01", "2002-02-01"), FinCenter = "GMT") 
+    print(tD)
     ###
     
     
@@ -367,15 +380,19 @@
     # p. 23
     # > as.numeric(td1)
     # ... use julian, that's more definite!
-    td1
-    julian(td1, "days")
+    print(td1)
+    tJ = julian(td1, units = "days")
+    print(tJ)
     # Add one day -  we use seconds!
     # ... these are 24 hours each with 3600 seconds
-    td1 + 24*3600
+    tD = td1 + 24*3600
+    print(tD)
     # Add half a day      
-    td1 + 12*3600
+    tD = td1 + 12*3600
+    print(tD)
     # One day earlier:
-    td1 - 24*3600
+    tD = td1 - 24*3600
+    print(tD)
     # > 2 * td1
     # > td1 + td2
     # ... not supported, multiplicating and adding dates 
@@ -386,7 +403,7 @@
     # Compute Differences - 'timeSpan' Objects:
     # p. 23
     td.diff = td2 - td1
-    td.diff
+    print(td.diff)
     class(td.diff)
     # > slotNames(td.diff)
     # ... it's a S3 method, therefore we have no slot names.
@@ -407,8 +424,9 @@
         y = 1900:1910,
         m = NULL)
     class(td)[1]
-    td
-    julian(td, "days")
+    print(td)
+    tJ = julian(td, units = "days")
+    print(tJ)
     ###
 
     
@@ -418,10 +436,10 @@
     td = timeSequence(
         from = "1/1/1900", 
         to = "1/1/1910", 
-        by = "years", 
+        by = "year", 
         format = "%m/%d/%Y")
     class(td)[1]
-    td
+    print(td)
     ###
     
     
@@ -430,25 +448,23 @@
 
     # Create quarterly sequence using 'timeSequence' function:
     # p. 25
-    timeSequence(
+    tS = timeSequence(
         from = "1/1/1900", 
         to = "10/1/1902", 
-        by = "quarters",
+        by = "quarter",
         format = "%m/%d/%Y")
-    # ... or
-    timeSequence(
-        from = "1/1/1900", 
-        to = "10/1/1902", 
-        by = "3 months",
-        format = "%m/%d/%Y")
+    print(tS)
     # Rmetrics prefers ISO-8601 Input:
     # ... jump to the next century
-    timeSequence(from = "2000-01-01", to = "2002-10-01", 
-    	by = "quarters", format = "%Y-%m-%d")
-    timeSequence(from = "20000101", to = "20021001", 
-    	by = "quarters", format = "%Y%m%d")
-    timeSequence(from = "2000-01-01 16:15:00", to = "2002-10-01 16:15:00", 
-        by = "quarters", format = "%Y-%m-%d %H:%M:%S")
+    tS = timeSequence(from = "2000-01-01", to = "2002-10-01", 
+        by = "quarter", format = "%Y-%m-%d")
+    print(tS)
+    tS = timeSequence(from = "20000101", to = "20021001", 
+        by = "quarter", format = "%Y%m%d")
+    print(tS)
+    tS = timeSequence(from = "2000-01-01 16:15:00", to = "2002-10-01 16:15:00", 
+        by = "quarter", format = "%Y-%m-%d %H:%M:%S")
+    print(tS)
     ###
     
     
@@ -461,30 +477,34 @@
     td = timeCalendar(
         y = rep(1900:1901, each = 12, length = 15),
         m = rep(1:12, length = 15) )
-    td
+    print(td)
     td@FinCenter
-    timeDate(td, FinCenter = "GMT")
-    timeDate(td, zone = td@FinCenter, FinCenter = "GMT")
+    tD = timeDate(td, FinCenter = "GMT")
+    print(tD)
+    tD = timeDate(td, zone = td@FinCenter, FinCenter = "GMT")
+    print(tD)
     ###
     
         
     # ... another monthly sequence using "timeSequence"
     # Create Dates with First Day in Month:
-    timeSequence(
+    tS = timeSequence(
         from = "1/1/1900",
         to = "3/1/1901",
-        by = "months",
+        by = "month",
         format = "%m/%d/%Y")
+    print(tS)
     ###
     
     
     # ... another monthly sequences using "timeSequence"
     # Create Dates with the Last Day in [previous] month
-    timeSequence(
+    tS = timeSequence(
         from = "1/1/1900", 
         to = "3/1/1901",
-        by = "months",
+        by = "month",
         format = "%m/%d/%Y") - 24*3600
+    print(tS)
     ###
     
     
@@ -497,11 +517,13 @@
     #  timeNthNdayInMonth   n-th ocurrance of a n-day in year/month
     #  timeLastNdayInMonth  the last n-day in year/month
     # Create dates with the first day in month ...
-    td = timeSequence(from = "1900-01-01", to = "1901-03-01", 
-    	by = "months", format = "%Y-%m-%d")
+    tD = timeSequence(from = "1900-01-01", to = "1901-03-01", 
+        by = "month", format = "%Y-%m-%d")
+    print(tD)
     # ... now look for the first Monday in Month:
     # Nore, "n"-day is a "Mon"-day, nth=1 for the 1st occurrence.
-    timeNthNdayInMonth(charvec = as.character(td), nday = 1, nth = 1)
+    tD = timeNthNdayInMonth(charvec = as.character(td), nday = 1, nth = 1)
+    print(tD)
     ###
     
         
@@ -510,23 +532,25 @@
     
     # Create weekly sequences using "timeSequence" function
     # p. 26
-    timeSequence(
+    tS = timeSequence(
         from = "1/1/1990", 
         to = "3/1/1990", 
-        by = "weeks",
+        by = "week",
         format = "%m/%d/%Y")
+    print(tS)
     ###
     
     
     # ... another weekly sequence using "timeSequence"
-    td = timeSequence("2000-01-01", "2000-12-31", 
-    	by = "weeks", format = "%Y-%m-%d")
-    td
+    tD = timeSequence("2000-01-01", "2000-12-31", 
+        by = "week", format = "%Y-%m-%d")
+    print(tD)
     # Starts on?
-    td@Data[1]$wday
+    getDayOfWeek(tD[1])
     # Returns 6, a Saturday
     # ... start on Monday
-    td + 24*3600
+    tD = tD + 24*3600
+    print(tD)
     ###
         
     
@@ -536,13 +560,16 @@
     # Create daily sequences using "timeSequence" function:
     # p. 26
     # ... for January 2004
-    timeSequence("2004-01-01", "2004-01-31", format = "%Y-%m-%d")
+    tS = timeSequence("2004-01-01", "2004-01-31", format = "%Y-%m-%d")
+    print(tS)
     # ... use "timeCalendar"
-    timeCalendar(2004, 1, 1:31)
+    tS = timeCalendar(2004, 1, 1:31)
+    print(tS)
     # ... use "timeDate
-    timeDate(c(
+    tD = timeDate(c(
         paste("2004-01-0", 1:9, sep = ""), 
         paste("2004-01-", 10:31, sep = "")), zone = myFinCenter)
+    print(tD)
     ###
     
     
@@ -556,90 +583,37 @@
     is.weekend = function(x) {
         return(!is.weekday(x)) }
     # ... January 2004
-    td = timeCalendar(2004, 1, 1:31)
-    td
+    tD = timeCalendar(2004, 1, 1:31)
+    print(tD)
     # ... exclude weekends, i.e. Saturdays and Sundays
-    td[is.weekday(td)]
+    print(tD[isWeekday(tD)])
     # ... list weekends
-    td[is.weekend(td)]
+    print(tD[isWeekend(tD)])
     ###
     
         
     # Print - New York Stock Exchange - Holiday Calendar for 2000
     # p. 26
-    NYSE2000 = holiday.NYSE(2000)
-    NYSE2000
+    NYSE2000 = holidayNYSE(2000)
+    print(NYSE2000)
+    NYSE2000@FinCenter = "America/NewYork"
     ###
-    
-    
-    # Create a holiday Calendar for Zurich in Switzerland:
-    # Rmetrics
-    # Inspect the holiday database in "data/holiday.db.R"
-    # ... You can add there additional holidays!
-    #   NewYearsDay         Jan, 1st
-    #   GoodFriday          2 days before Easter
-    #   EasterMonday        1 day after Easter
-    #   LaborDay            May, 1st  
-    #   PentecostMonday     50 days after Easter
-    #   ChristmasDay        Dec, 25 
-    #   BoxingDay           Dec, 26  
-    #   CHBerchtoldsDay     Jan, 2nd
-    #   CHSechselaeuten     3rd Monday in April 
-    #                       1 week later if it coincides with Easter Monday
-    #   CHAscension         39 days after Easter
-    #   CHConfederationDay  Aug, 1st
-    #   CHKnabenschiessen   2nd Saturday to Monday in Sep
-    holiday.ZURICH = function(y = currentYear) {
-        years = y
-        holidays = NULL
-        # Iterate Years:
-        for (y in years ) { 
-            holidays = c(holidays, NewYearsDay(y))
-            holidays = c(holidays, GoodFriday(y))   
-            holidays = c(holidays, EasterMonday(y)) 
-            holidays = c(holidays, LaborDay(y))
-            holidays = c(holidays, PentecostMonday(y))  
-            holidays = c(holidays, ChristmasDay(y)) 
-            holidays = c(holidays, BoxingDay(y)) 
-            holidays = c(holidays, CHBerchtoldsDay(y))
-            holidays = c(holidays, CHSechselaeuten(y))
-            holidays = c(holidays, CHAscension(y))
-            holidays = c(holidays, CHConfederationDay(y))
-            holidays = c(holidays, CHKnabenschiessen(y)) }
-        # Sort and Convert to 'timeDate':
-        holidays = as.character(sort(holidays))
-        ans = timeDate(holidays, format = "%Y%m%d", FinCenter = "GMT")
-        # Remove Remaining Weekend Dates:
-        ans = ans[!( (ans@Data)$wday == 0 | (ans@Data)$wday == 6 )]
-        # Set Financial Center:
-        ans@FinCenter = "Europe/Zurich"
-        # Return Value:
-        ans }
-    # Zurich Holidays:
-    holiday.ZURICH(2004:2005)
-    ###
-    
+ 
 
     # Extract Business Days in January 2000 - New York
     # Note, the 'timeSequence' function cannot exclude directly holidays,
     # therefore we dot it in a 2 step approach using the function 'is.bizday'
     # Create Sequence ...
-    td = timeSequence(
+    tD = timeSequence(
         from = "2000-01-01", 
         to = "2000-01-31",
-        by = "days",
+        by = "day",
         format = "%Y-%m-%d", 
         FinCenter = "America/NewYork")
-    td
-    # There are no functions for is.bizday()
-    # Let us write one:
-    is.bizday = function(x, holidays) { 
-        if (x@FinCenter != holidays@FinCenter) stop("Different FinCenters")
-        x = is.weekday(modify(x, "trunc", "days"))
-        return(x[!(as.character(x) %in% as.character(holidays))]) }
+    print(tD)
     # Remove NYSE Holidays ...
-    td = td[is.bizday(td, NYSE2000)]
-    td
+    tD = tD[isBizday(tD, NYSE2000)]
+    print(tD)
     ###
     
 
@@ -649,28 +623,39 @@
     # Create a sequence of hourly observations from 9 AM to 3 PM 
     # p. 27
     # What is the current FinCenter?
-    myFinCenter
+    print(myFinCenter)
     # Create 'timeDate' Object:
     # ... on Jan 3 and Jan 4, 2000
-    td = timeCalendar(
+    tD = timeCalendar(
         y = 2000, 
         m = 1,
         d = rep(3:4, each = 7), 
         h = rep(9:15, 2) )
-    td 
+    print(tD) 
     # Where we are ?
-    td@FinCenter
+    print(tD@FinCenter)
     # Create the same for New York ...
     tdNY = timeCalendar(
         y = 2000, 
         m = 1,
         d = rep(3:4, each = 7), 
         h = rep(9:15, 2), 
+        min = rep(0, times = 14),
+        s = rep(0, times = 14),
         FinCenter = "America/NewYork" )
-    tdNY 
+    print(tdNY) 
+    
+    y = 2000
+    m = 1
+    d = rep(3:4, each = 7)
+    h = rep(9:15, 2)
+    min = rep(0, times = 14)
+    s = rep(0, times = 14)
+    FinCenter = "America/NewYork"
+    
     # What time was it in Zurich ?
     tdZUR = timeDate(tdNY, zone = tdNY@FinCenter)
-    tdZUR
+    print(tdZUR)
     ###
     
         
@@ -688,9 +673,9 @@
         h = c(hrs, hrs),
         min = c(min, min),
         FinCenter = "America/LosAngeles")
-    tdLA[c(1:5, 361:365)]
+    print(tdLA[c(1:5, 361:365)])
     # Confirm Financial Center:
-    tdLA@FinCenter
+    print(tdLA@FinCenter)
     ###
  
 
@@ -701,18 +686,18 @@
     # Use miscellaneous utility functions:
     # p. 28
     # Return Julian Counts as 'difftime' in Seconds:
-    tdLA[1:10]
-    julian(tdLA)[1:10]
+    print(tdLA[1:10])
+    print(julian(tdLA)[1:10])
     # Return Julian Counts as 'difftime' in Days:
-    julian(tdLA, "days")[1:10]
+    print(julian(tdLA, units = "days")[1:10])
     # Return 'timeDate' s integer counts:
-    as.integer(julian(tdLA))[1:10]
+    print(as.integer(julian(tdLA, units = "secs"))[1:10])
     ###
     
     
     # Extract 'timeDate' atoms:
     # Rmetrics
-    atoms(tdLA)[1:10, ]
+    print(atoms(tdLA)[1:10, ])
     ###
  
        
@@ -720,12 +705,9 @@
 # Section 2.2.5 - Creating 'timeSeries' Objects
 
 
-	# The function 'read.timeSeries' allows you to read data from a
-    # spreadsheet file and transforms it ditrectly to a 'timeSeries'
-    # object.
-    args(read.timeSeries)
-    # Where are the Data?
-    dataPath = "library/fBasics/data/"
+    # The function 'readSeries' allows you to read data from a
+    # spreadsheet file and transforms it directly to a 'timeSeries' object.
+    args(readSeries)
     ###
 
 
@@ -744,10 +726,10 @@
         charvec = my.td@Data, 
         units = colnames(my.df),
         FinCenter = "GMT")
-    my.ts
+    print(my.ts)
     # Change Position Names ...
     rownames(my.ts@Data) = substr(rownames(my.ts@Data), 1, 4)
-    my.ts
+    print(my.ts)
     ###
     
     
@@ -781,7 +763,8 @@
         cat("\n Units:             ", x@units)
         cat("\n Title:             ", x@title)
         cat("\n Documentation:     ", x@documentation)
-        cat("\n") }  
+        cat("\n") 
+    }  
     summary(my.ts)
     ###
     
@@ -806,10 +789,13 @@
     # transaction information of Yahoo stock, with the following 
     # six columns: Date, Open, High, Low, Close, Volume.
     # Data are downloadable and can be updated from Yahoo's web site.
-    yhoo.df = read.timeSeries(
-        paste(dataPath, "yhoo.df.csv", sep = ""))
-    yhoo.df[1,]
-    end(yhoo.df)
+    URL = "http://www.itp.phys.ethz.ch/econophysics/R/data/textbooks/"
+    SRC = "ZivotWang/data/yhoo.df.csv"
+    DATA = paste(URL, SRC, sep = "") 
+    download.file(DATA, destfile = "yhoo.df.csv")
+    yhoo.df = readSeries("yhoo.df.csv")
+    print(yhoo.df[1,])
+    print(end(yhoo.df))
     ###
     
     
@@ -890,10 +876,9 @@
     # The file "singleIndex.dat.csv" contains the monthly closing 
     # prices for Microsoft Corporation and the S&P 500 index.
     # Data are downloadable and can be updated from Yahoo's web site.
-    singleIndex.dat = read.timeSeries(
-        paste(dataPath, "singleIndex.dat.csv", sep = ""))
-    singleIndex.dat[1,]
-    end(singleIndex.dat)
+    singleIndex.dat = readSeries("singleIndex.dat.csv")
+    print(singleIndex.dat[1,])
+    print(end(singleIndex.dat))
     ###
     
     
@@ -928,10 +913,13 @@
     # The file "msft.dat.csv" contains data representing the open, 
     # high, low, close and volume information for Microsoft stocks. 
     # Data are downloadable and can be updated from Yahoo's web site.
-    msft.dat = read.timeSeries(
-        paste(dataPath, "msft.dat.csv", sep = ""))
-    msft.dat[1, ]
-    end(msft.dat)
+    URL = "http://www.itp.phys.ethz.ch/econophysics/R/data/textbooks/"
+    SRC = "ZivotWang/data/msft.dat.csv"
+    DATA = paste(URL, SRC, sep = "") 
+    download.file(DATA, destfile = "msft.dat.csv")
+    msft.dat = readSeries("msft.dat.csv")
+    print(msft.dat[1,])
+    print(end(msft.dat))
     ###
     
     
@@ -980,23 +968,29 @@
     
     
     # The file "IP.dat.csv" contains data representing seasonally 
-	# adjusted U.S. Industrial Production Index. 
-	# The file "CPI.dat.csv" contains data representing seasonally 
-	# adjusted U.S. Consumer Price Index (CPI). 
-	# Data are downloadable from Economagics's web site.
-	# Start with IP:
-	IP.dat = read.timeSeries(
-		paste(dataPath, "IP.dat.csv", sep = ""))
-	IP.dat[1,]
-	end(IP.dat)
-	# Next CPI
-	CPI.dat = read.timeSeries(
-		paste(dataPath, "CPI.dat.csv", sep = ""))
-	CPI.dat[1,]
-	end(CPI.dat)
-	###
-	
-	
+    # adjusted U.S. Industrial Production Index. 
+    # The file "CPI.dat.csv" contains data representing seasonally 
+    # adjusted U.S. Consumer Price Index (CPI). 
+    # Data are downloadable from Economagics's web site.
+    # Start with IP:
+    URL = "http://www.itp.phys.ethz.ch/econophysics/R/data/textbooks/"
+    SRC = "ZivotWang/data/IP.dat.csv"
+    DATA = paste(URL, SRC, sep = "") 
+    download.file(DATA, destfile = "IP.dat.csv")
+    IP.dat = readSeries("IP.dat.csv")
+    print(IP.dat[1,])
+    print(end(IP.dat))
+    # Next CPI:
+    URL = "http://www.itp.phys.ethz.ch/econophysics/R/data/textbooks/"
+    SRC = "ZivotWang/data/CPI.dat.csv"
+    DATA = paste(URL, SRC, sep = "") 
+    download.file(DATA, destfile = "CPI.dat.csv")
+    CPI.dat = readSeries("CPI.dat.csv")
+    print(CPI.dat[1,])
+    print(end(CPI.dat))
+    ###
+    
+    
     # Disaggregate - Interpolating monthly CPI to daily CPI:
     # p. 35
     # CPI Data is monthly - thus we have to disaggregate ...
@@ -1009,14 +1003,16 @@
     
     
     # The file "DowJones30.csv" contains closing prices for 30 stocks
-	# represented in the Dow Jones Industrial Average Index. 
-	# Data are downloadable from Yahoo's web site.	
-	DowJones30 = read.timeSeries(
-		paste(dataPath, "DowJones30.csv", sep = ""))
-	DowJones30[1,]
-	head(DowJones30)
-    tail(DowJones30)
-	###
+    # represented in the Dow Jones Industrial Average Index. 
+    # Data are downloadable from Yahoo's web site.
+    URL = "http://www.itp.phys.ethz.ch/econophysics/R/data/textbooks/"
+    SRC = "ZivotWang/data/DowJones30.csv"
+    DATA = paste(URL, SRC, sep = "") 
+    download.file(DATA, destfile = "DowJones30.csv")
+    DowJones30 = readSeries("DowJones30.csv")
+    print(DowJones30[1,])
+    print(end(DowJones30))
+    ###
     
     
     # Disaggregate - Using "before", "after", "interp" methods
@@ -1050,7 +1046,7 @@
     # ... that we miss no days according to different holiday rules
     # Cut nicely:
     cpi.daily.interp = 
-    	cutSeries(cpi.daily.interp, "1991-01-01", "2000-12-31")
+        cutSeries(cpi.daily.interp, "1991-01-01", "2000-12-31")
     cpi.daily.interp[c(1:3, 21:23)]
     # ... note weekends are excluded
     #
@@ -1058,13 +1054,13 @@
     msft.daily.p = DowJones30[, "MSFT"] 
     msft.daily.interp = 
         alignDailySeries(msft.daily.p, method = "interp", 
-        	include.weekends = TRUE)
+            include.weekends = TRUE)
     c(start(msft.daily.interp), end(msft.daily.interp)) 
     msft.daily.interp = cutSeries(msft.daily.interp, 
-    	from = start(cpi.daily.interp), to = end(cpi.daily.interp))
+        from = start(cpi.daily.interp), to = end(cpi.daily.interp))
     # Cut nicely:
     msft.daily.interp = 
-    	cutSeries(msft.daily.interp, "1991-01-01", "2000-12-31")
+        cutSeries(msft.daily.interp, "1991-01-01", "2000-12-31")
     msft.daily.interp[c(1:3, 21:23)]
     # Ceck Dimensions:
     dim(cpi.daily.interp@Data)
@@ -1089,13 +1085,16 @@
     
     # The file "shiller.annual.csv" holds Robert Shiller's financial
     # and economic data.
-	shiller.annual = read.timeSeries(
-		paste(dataPath, "shiller.annual.csv", sep = ""))
-	shiller.annual[1, ]
-    tail(shiller.annual, 1)
-	###
-	
-	
+    URL = "http://www.itp.phys.ethz.ch/econophysics/R/data/textbooks/"
+    SRC = "ZivotWang/data/shiller.annual.csv"
+    DATA = paste(URL, SRC, sep = "") 
+    download.file(DATA, destfile = "shiller.annual.csv")
+    shiller.annual = readSeries("shiller.annual.csv")
+    print(shiller.annual[1,])
+    print(end(shiller.annual))
+    ###
+    
+    
     # Disaggregate:
     # p. 37
     # Rmetrics 
@@ -1105,70 +1104,70 @@
     #   using cubic spline interpolations.
     # Select Data:
     div.annual  = shiller.annual[, "dividend"]     
-	# Write Your Personal Disaggregation Function:
-	disaggregateAnnualSeries = function(data, k, out.positions, 
-	 	type = "spline") {
-		# Here we assume an univariate timeSeries as input
-		data = cumsum(as.vector(seriesData(data)))
-		n = length(data)
-		# Use cubic Spline Interpolation:
-		if (type == "spline") {
-			ans = spline(x = (1:n)*k, data, n = n*k, xmin = 1, xmax = n*k)$y
-			ans = c(ans[1], diff(ans)) }
-		else {
-			# Here you can add further approaches based on
-			# other approximations, interpolations, imputations,
-			# and regression schemes ...
-			stop("Wrong type selected") }
-		# Convert Result to timSeries Object
-		timeSeries(ans, out.positions, FinCenter = "GMT", units = "dividend") }	
-	# Create disaggregated Series:
-	monthly.dates = timeCalendar(
-		y = rep(1871:2000, each = 12), m = rep(1:12, times = 130) )
-	div.monthly = disaggregateAnnualSeries(
-		data = div.annual, k = 12, out.positions = monthly.dates )
-	# Print:
-	div.monthly[1:24, ]
-	# ... Note, there are smaller differences for the first year
-	# which is extrapolated from the spline fit. 
-	###
-	
-			
-	# Compare just the numbers with SPlus for the first 72 months:
-	# Rmetrics
-	# Annual Data:
-	time.annually = as.numeric((1:6)*12)
-	div.annually = as.vector(unlist(seriesData(shiller.annual[1:6, "dividend"])))
-	# Now Monthly:
-	time.monthly = 1:72
-	div.monthly.R = as.vector(div.monthly)[1:72]
-	div.monthly.SPlus = c(	
-		0.02999, 0.01867, 0.01916, 0.01963, 0.02009, 0.02054,
-		0.02097, 0.02140, 0.02181, 0.02220, 0.02259, 0.02296,
-		0.02332, 0.02367, 0.02400, 0.02433, 0.02463, 0.02493,
-		0.02522, 0.02549, 0.02575, 0.02599, 0.02623, 0.02645,
-		0.02666, 0.02685, 0.02703, 0.02720, 0.02736, 0.02751,
-		0.02764, 0.02776, 0.02787, 0.02796, 0.02804, 0.02811,
-		0.02817, 0.02818, 0.02816, 0.02809, 0.02798, 0.02783,
-		0.02764, 0.02741, 0.02714, 0.02683, 0.02648, 0.02608,
-		0.02567, 0.02530, 0.02501, 0.02479, 0.02465, 0.02458,
-		0.02458, 0.02465, 0.02479, 0.02501, 0.02530, 0.02567,
-		0.02607, 0.02636, 0.02650, 0.02650, 0.02636, 0.02607,
-		0.02563, 0.02505, 0.02432, 0.02345, 0.02243, 0.02127)	
-	# Plot it:
-	div = c(div.monthly.SPlus, div.monthly.R)
-	par(mfrow = c(2, 1), cex = 0.7)
-	plot(1870+time.monthly/12, div.monthly.SPlus, ylim = range(div),
-		xlab = "Year", ylab = "Dividend", main = "First six years")
-	points(1870+time.monthly/12, div.monthly.R, col = "green")
-	# Use year-midpoints
-	points(1870+time.annually/12 - 0.5, div.annually/12, col = "red")
-	# Annual Values:
-	apply(matrix(div.monthly.SPlus, byrow = TRUE, ncol = 12), 1, sum)
-	apply(matrix(div.monthly.R, byrow = TRUE, ncol = 12), 1, sum)
-	# ... note the extrapolation part looks different.
-	###
-		
+    # Write Your Personal Disaggregation Function:
+    disaggregateAnnualSeries = function(data, k, out.positions, 
+        type = "spline") {
+        # Here we assume an univariate timeSeries as input
+        data = cumsum(as.vector(seriesData(data)))
+        n = length(data)
+        # Use cubic Spline Interpolation:
+        if (type == "spline") {
+            ans = spline(x = (1:n)*k, data, n = n*k, xmin = 1, xmax = n*k)$y
+            ans = c(ans[1], diff(ans)) }
+        else {
+            # Here you can add further approaches based on
+            # other approximations, interpolations, imputations,
+            # and regression schemes ...
+            stop("Wrong type selected") }
+        # Convert Result to timSeries Object
+        timeSeries(ans, out.positions, FinCenter = "GMT", units = "dividend") } 
+    # Create disaggregated Series:
+    monthly.dates = timeCalendar(
+        y = rep(1871:2000, each = 12), m = rep(1:12, times = 130) )
+    div.monthly = disaggregateAnnualSeries(
+        data = div.annual, k = 12, out.positions = monthly.dates )
+    # Print:
+    div.monthly[1:24, ]
+    # ... Note, there are smaller differences for the first year
+    # which is extrapolated from the spline fit. 
+    ###
+    
+            
+    # Compare just the numbers with SPlus for the first 72 months:
+    # Rmetrics
+    # Annual Data:
+    time.annually = as.numeric((1:6)*12)
+    div.annually = as.vector(unlist(seriesData(shiller.annual[1:6, "dividend"])))
+    # Now Monthly:
+    time.monthly = 1:72
+    div.monthly.R = as.vector(div.monthly)[1:72]
+    div.monthly.SPlus = c(  
+        0.02999, 0.01867, 0.01916, 0.01963, 0.02009, 0.02054,
+        0.02097, 0.02140, 0.02181, 0.02220, 0.02259, 0.02296,
+        0.02332, 0.02367, 0.02400, 0.02433, 0.02463, 0.02493,
+        0.02522, 0.02549, 0.02575, 0.02599, 0.02623, 0.02645,
+        0.02666, 0.02685, 0.02703, 0.02720, 0.02736, 0.02751,
+        0.02764, 0.02776, 0.02787, 0.02796, 0.02804, 0.02811,
+        0.02817, 0.02818, 0.02816, 0.02809, 0.02798, 0.02783,
+        0.02764, 0.02741, 0.02714, 0.02683, 0.02648, 0.02608,
+        0.02567, 0.02530, 0.02501, 0.02479, 0.02465, 0.02458,
+        0.02458, 0.02465, 0.02479, 0.02501, 0.02530, 0.02567,
+        0.02607, 0.02636, 0.02650, 0.02650, 0.02636, 0.02607,
+        0.02563, 0.02505, 0.02432, 0.02345, 0.02243, 0.02127)   
+    # Plot it:
+    div = c(div.monthly.SPlus, div.monthly.R)
+    par(mfrow = c(2, 1), cex = 0.7)
+    plot(1870+time.monthly/12, div.monthly.SPlus, ylim = range(div),
+        xlab = "Year", ylab = "Dividend", main = "First six years")
+    points(1870+time.monthly/12, div.monthly.R, col = "green")
+    # Use year-midpoints
+    points(1870+time.annually/12 - 0.5, div.annually/12, col = "red")
+    # Annual Values:
+    apply(matrix(div.monthly.SPlus, byrow = TRUE, ncol = 12), 1, sum)
+    apply(matrix(div.monthly.R, byrow = TRUE, ncol = 12), 1, sum)
+    # ... note the extrapolation part looks different.
+    ###
+        
     
 # ------------------------------------------------------------------------------
 # Section 2.2.7 - Merging Time Series
@@ -1180,14 +1179,12 @@
     # adjusted U.S. Consumer Price Index (CPI). 
     # Data are downloadable and can be updated from Economagics's web site. 
     # Rmetrics
-    IP.dat = read.timeSeries(
-    	paste(dataPath, "IP.dat.csv", sep = ""))
-    IP.dat[1, ]
-    end(IP.dat)
-    CPI.dat = read.timeSeries(
-    	paste(dataPath, "CPI.dat.csv", sep = ""))
-    CPI.dat[1, ]
-    end(CPI.dat)
+    IP.dat = readSeries("IP.dat.csv")
+    print(IP.dat[1, ])
+    print(end(IP.dat))
+    CPI.dat = readSeries("CPI.dat.csv")
+    print(CPI.dat[1, ])
+    print(end(CPI.dat))
     ###
     
     
@@ -1230,45 +1227,45 @@
     # Show the arguments of the "interpNA" function:
     # p. 40
     # Let us a write a simple function for NA imputation:
-	interpNA = 
-	function(x, method = c("linear", "constant", "before", "after")) {
-		# Description:
-		#  	Interpolates missing values in a vector	 	
-		# Which Method?
-		method = method[1]
-		f = 0
-		if (method == "before") { method = "constant"; f = 0 }
-		if (method == "after") { method = "constant"; f = 1 }
-		# Interpolate:
-		n = length(x)
-		idx = (1:n)[!is.na(x)]
-	    x = approx(idx, x[idx], 1:n, method = method, f = f)$y
-	    # Return Value:
-	    matrix(x, ncol = 1) }    
+    interpNA = 
+    function(x, method = c("linear", "constant", "before", "after")) {
+        # Description:
+        #   Interpolates missing values in a vector     
+        # Which Method?
+        method = method[1]
+        f = 0
+        if (method == "before") { method = "constant"; f = 0 }
+        if (method == "after") { method = "constant"; f = 1 }
+        # Interpolate:
+        n = length(x)
+        idx = (1:n)[!is.na(x)]
+        x = approx(idx, x[idx], 1:n, method = method, f = f)$y
+        # Return Value:
+        matrix(x, ncol = 1) }    
     ###
     
     
     # Use "interpNA" Function:
     # p. 40
     dates = c(
-	    "01/02/1990", "01/03/1990", "01/04/1990", "01/05/1990", "01/09/1990",
-	 	"01/10/1990", "01/12/1990", "01/15/1990", "01/16/1990", "01/17/1990",
-	 	"01/18/1990", "01/19/1990", "01/22/1990", "01/23/1990", "01/24/1990",
-	 	"01/25/1990", "01/26/1990", "01/29/1990", "01/30/1990", "01/31/1990")
-	close = c(
-		2810.15, 2809.73, 2796.08, 2773.25, 2766.00, 2750.64, 2689.21, 
-		2669.37, 2692.62, 2659.13,      NA, 2677.90, 2600.45, 2615.32, 
-		2604.50, 2561.04, 2559.23, 2553.38, 2543.24, 2590.54)
-	djia.close = 
-		timeSeries(close, dates, format = "%m/%d/%Y", FinCenter = "GMT",
-		units = "djia.close")
-	djia.close[10:12]
-	dimNames = dimnames(djia.close@Data)
-	# Use linear interpolation scheme:
-	djia.close@Data <- interpNA(x = seriesData(djia.close))
-	dimnames(djia.close@Data) <- dimNames
-	djia.close[10:12]
-	# ... Try to implement spline interpolation
+        "01/02/1990", "01/03/1990", "01/04/1990", "01/05/1990", "01/09/1990",
+        "01/10/1990", "01/12/1990", "01/15/1990", "01/16/1990", "01/17/1990",
+        "01/18/1990", "01/19/1990", "01/22/1990", "01/23/1990", "01/24/1990",
+        "01/25/1990", "01/26/1990", "01/29/1990", "01/30/1990", "01/31/1990")
+    close = c(
+        2810.15, 2809.73, 2796.08, 2773.25, 2766.00, 2750.64, 2689.21, 
+        2669.37, 2692.62, 2659.13,      NA, 2677.90, 2600.45, 2615.32, 
+        2604.50, 2561.04, 2559.23, 2553.38, 2543.24, 2590.54)
+    djia.close = 
+        timeSeries(close, dates, format = "%m/%d/%Y", FinCenter = "GMT",
+        units = "djia.close")
+    djia.close[10:12]
+    dimNames = dimnames(djia.close@Data)
+    # Use linear interpolation scheme:
+    djia.close@Data <- interpNA(x = seriesData(djia.close))
+    dimnames(djia.close@Data) <- dimNames
+    djia.close[10:12]
+    # ... Try to implement spline interpolation
     ###
 
 
@@ -1276,20 +1273,18 @@
 # Section 2.3 - TIME SERIES MANIPULATIONS 
 
 
-	# In this Chapter we deal only with "Date" data, therefore we set
-	myFinCenter = "GMT"
-	###
-	
-	
-	# The function 'read.timeSeries' allows you to read data from a
+    # In this Chapter we deal only with "Date" data, therefore we set
+    myFinCenter = "GMT"
+    ###
+    
+    
+    # The function 'readSeries' allows you to read data from a
     # spreadsheet file and transforms it ditrectly to a 'timeSeries'
     # object.
-    args(read.timeSeries)
-    # Where are the Data?
-    dataPath = "library/fBasics/data/"
-    ###	
-	  
-	  
+    args(readSeries)
+    ### 
+      
+      
 # ------------------------------------------------------------------------------    
 # Section 2.3.1 - PART A: Creating Lags
 
@@ -1297,8 +1292,6 @@
     # The file "singleIndex.dat.csv" contains the monthly closing 
     # prices for Microsoft Corporation and the S&P 500 index.
     # Data are downloadable and can be updated from Yahoo's web site.
-    singleIndex.dat = read.timeSeries(
-        paste(dataPath, "singleIndex.dat.csv", sep = ""))
     singleIndex.dat[1,]
     end(singleIndex.dat)
     ###
@@ -1441,7 +1434,7 @@
     # Create a series of discrete returns:
     # p. 46
     ret.d = returnSeries(singleIndex.dat, type = "discrete", 
-		percentage = TRUE, trim = FALSE, digits = 5)
+        percentage = TRUE, trim = FALSE, digits = 5)
     ret.d[1:3, ]
     ###
     
@@ -1480,15 +1473,15 @@
     c(start(ret.cc), end(ret.cc))
     # Last Days in Month:
     from = timeSequence("1990-03-01", "2000-03-01", "month",
-    	format = "%Y-%m-%d") - 24*3600
+        format = "%Y-%m-%d") - 24*3600
     to   = timeSequence("1991-02-01", "2001-02-01", "month",
-    	format = "%Y-%m-%d") - 24*3600 
+        format = "%Y-%m-%d") - 24*3600 
     # Annual Sum Aggregates on Monthly Scale:
     applySeries(x = ret.cc, from, to, colSums)[1:3, ]
     rbind(
-    	colSums(seriesData(ret.cc[1:12, ])),
-    	colSums(seriesData(ret.cc[2:13, ])),
-    	colSums(seriesData(ret.cc[3:14, ])))
+        colSums(seriesData(ret.cc[1:12, ])),
+        colSums(seriesData(ret.cc[2:13, ])),
+        colSums(seriesData(ret.cc[3:14, ])))
     # Note, that the rownames are to my feeling somewhat strange.
     # "The annual return reported for Feb 1990 is the sum of the 
     # twelve monthly returns from February 1990 through January 
@@ -1506,10 +1499,10 @@
     to = timeCalendar(y = 1991:2001, m = 1) - 24*3600
     applySeries(x = ret.cc, from = from, to = to, FUN = colSums)[1:3, ]
     rbind(
-    	colSums(seriesData(ret.cc[1:11, ])),
-    	colSums(seriesData(ret.cc[12:23, ])),
-    	colSums(seriesData(ret.cc[24:35, ])))
-    ###	
+        colSums(seriesData(ret.cc[1:11, ])),
+        colSums(seriesData(ret.cc[12:23, ])),
+        colSums(seriesData(ret.cc[24:35, ])))
+    ### 
     
     
     # Next, monthly >>discrete<< returns on an annual step size
@@ -1517,12 +1510,12 @@
     # Last Days in Month:
     ret.d = returnSeries(singleIndex.dat, type = "discrete", digits = 12)
     from = timeSequence("1990-03-01", "2000-03-01", "month",
-    	format = "%Y-%m-%d") - 24*3600
+        format = "%Y-%m-%d") - 24*3600
     to   = timeSequence("1991-02-01", "2001-02-01", "month",
-    	format = "%Y-%m-%d") - 24*3600 
-	colProds = function (x) { round (
-		apply(x+1, MARGIN = 2, FUN = prod) - 1 , digits = 6 ) }
-	applySeries(x = ret.d, from, to, FUN = colProds)[1:3, ]
+        format = "%Y-%m-%d") - 24*3600 
+    colProds = function (x) { round (
+        apply(x+1, MARGIN = 2, FUN = prod) - 1 , digits = 6 ) }
+    applySeries(x = ret.d, from, to, FUN = colProds)[1:3, ]
     colProds(seriesData(ret.d)[1:12, ])
     ### 
     
@@ -1531,13 +1524,13 @@
     # p. 48
     # Last Days in Month:
     ret.d = returnSeries(singleIndex.dat, type = "discrete", 
-    	trim = FALSE, digits = 12)
+        trim = FALSE, digits = 12)
     from = timeCalendar(y = 1990:2000, m = 2) - 24*3600
     to = timeCalendar(y = 1991:2001, m = 1) - 24*3600
     colProds = function (x) { round (
-		apply(x+1, MARGIN = 2, FUN = prod) - 1 , digits = 4 ) }
-	applySeries(x = ret.d, from, to, FUN = colProds)[1:3, ]
-	###
+        apply(x+1, MARGIN = 2, FUN = prod) - 1 , digits = 4 ) }
+    applySeries(x = ret.d, from, to, FUN = colProds)[1:3, ]
+    ###
     
 
 # ------------------------------------------------------------------------------
@@ -1553,12 +1546,10 @@
     ###
     
     
-    # The function 'read.timeSeries' allows you to read data from a
+    # The function 'readSeries' allows you to read data from a
     # spreadsheet file and transforms it ditrectly to a 'timeSeries'
     # object.
-    args(read.timeSeries)
-    # Where are the Data?
-    dataPath = "library/fBasics/data/"
+    args(readSeries)
     ###
     
 
@@ -1570,10 +1561,9 @@
     # prices for Microsoft Corporation and the S&P 500 index.
     # Data are downloadable and can be updated from Yahoo's web site.
     # Rmetrics
-    singleIndex.dat = read.timeSeries(
-        paste(dataPath, "singleIndex.dat.csv", sep = ""))
-    singleIndex.dat[1, ]
-    end(singleIndex.dat)
+    singleIndex.dat = readSeries("singleIndex.dat.csv")
+    print(singleIndex.dat[1, ])
+    print(end(singleIndex.dat))
     ###
     
     
@@ -1591,10 +1581,10 @@
     # Plot:
     par(mfrow = c(2, 1), cex = 0.7)
     plot(msft.p, type = "l", ylab = msft.p@units, 
-    	main = msft.p@title, col = "steelblue4")
+        main = msft.p@title, col = "steelblue4")
     # Use solid grid lines ...
     plot(msft.p, type = "l", ylab = msft.p@units, 
-    	main = msft.p@title, col = "steelblue4")
+        main = msft.p@title, col = "steelblue4")
     grid(lty = "solid")
     ###
     
@@ -1609,7 +1599,7 @@
     # With Legend and Plot Arguments:
     # > legend(0.1, 1400, legend = colnames(singleIndex.ts), lty = c(1, 3))
     plot(singleIndex.dat, lty = c(1, 3), xlab = "Year", 
-    	ylab = "Index - Stock Price", col = "steelblue4")
+        ylab = "Index - Stock Price", col = "steelblue4")
     title(singleIndex.dat@title)
     ### 
 
@@ -1626,10 +1616,9 @@
     # The file "msft.dat.csv" contains data representing the open, 
     # high, low, close and volume information for Microsoft stocks. 
     # Data are downloadable and can be updated from Yahoo's web site.
-    msft.dat = read.timeSeries(
-        paste(dataPath, "msft.dat.csv", sep = ""))
-    msft.dat[1, ]
-    end(msft.dat)
+    msft.dat = readSeries("msft.dat.csv")
+    print(msft.dat[1, ])
+    print(end(msft.dat))
     ###
        
     
@@ -1656,10 +1645,9 @@
     # The file "DowJones30.csv" contains closing prices for 30 stocks
     # represented in the Dow Jones Industrial Average Index. 
     # Data are downloadable and can be updated from Yahoo's web site.   
-    DowJones30 = read.timeSeries(
-        paste(dataPath, "DowJones30.csv", sep = ""))
-    DowJones30[1,]
-    end(DowJones30)
+    DowJones30 = readSeries("DowJones30.csv")
+    print(DowJones30[1,])
+    print(end(DowJones30))
     ###
     
       
@@ -1670,11 +1658,11 @@
     par(mfrow = c(3, 2), cex = 0.5)
     for ( i in 1:6 ) {
         plot(
-        	DJ.ret[, i], 
-        	type = "l", 
-        	xlab = "Year", 
-        	ylab = "Return", 
-        	col = "steelblue4")
+            DJ.ret[, i], 
+            type = "l", 
+            xlab = "Year", 
+            ylab = "Return", 
+            col = "steelblue4")
         title(main = DJ.ret@units[i])  }
     ###
         
@@ -1700,7 +1688,7 @@
     par(mfrow = c(3, 2), cex = 0.5)
     for ( i in 1:6 ) {
         qqnorm(
-        	seriesData(DJ.ret[, i]), 
+            seriesData(DJ.ret[, i]), 
             ylim = c(-15, 15),
             main = DJ.ret@units[i],
             col = "steelblue4")
@@ -1710,5 +1698,5 @@
     ###
 
 
-# ------------------------------------------------------------------------------
+################################################################################
 
