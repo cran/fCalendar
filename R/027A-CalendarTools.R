@@ -48,19 +48,32 @@
 .currentYear = 
 function()    
 {
-	if (class(version) != "Sversion") {
-	    currentYear = as.POSIXlt(Sys.time())$year + 1900
-	} else { 
-    	currentDate = timeDate(date(), in.format="%w %m %d %H:%M:%S %Z %Y")
-    	currentYear = as.integer(attr(years(currentDate), "levels"))
-	} 
-	currentYear 
+    # Check Time Zone:
+    TZ = Sys.getenv("TZ")  
+    if (TZ[[1]] != "GMT") {
+        Sys.putenv(TZ = "GMT")
+        TZ.RESET = TRUE
+    } else {
+        TZ.RESET = FALSE
+    }
+    
+    # Current Year:
+    if (class(version) != "Sversion") {
+        currentYear = as.POSIXlt(Sys.time())$year + 1900
+    } else { 
+        currentDate = timeDate(date(), in.format="%w %m %d %H:%M:%S %Z %Y")
+        currentYear = as.integer(attr(years(currentDate), "levels"))
+    } 
+    
+    # Return Value:
+    if (TZ.RESET) Sys.putenv(TZ = TZ)
+    currentYear 
 }
 
     
-	myFinCenter =  "Zurich"
-	myUnits = "days"
-	currentYear = .currentYear()  
+myFinCenter =  "Zurich"
+myUnits = "days"
+currentYear = .currentYear()  
 
 
 # ------------------------------------------------------------------------------
@@ -69,18 +82,18 @@ function()
 # Set a timezone if none found in environment variables or options()
 # ... as suggested by Dirk Eddelbuettel, thanks Dirk.
 
-	if (class(version) != "Sversion") {
-	    if (Sys.getenv("TZ") == "") {
-	        if (is.null(getOption("TZ"))) {
-	            cat("No timezone information found, using default of GMT\n")
-	            Sys.putenv("TZ" = "GMT") 
-	        } else {
-	            cat("No timezone information found, applying option() value of",
-	                getOption("TZ"), "\n")
-	            Sys.putenv("TZ" = getOption("TZ")) 
-	        } 
-		}
-	}
+##  if (class(version) != "Sversion") {
+##      if (Sys.getenv("TZ") == "") {
+##          if (is.null(getOption("TZ"))) {
+##              cat("No timezone information found, using default of GMT\n")
+##              Sys.putenv("TZ" = "GMT") 
+##          } else {
+##              cat("No timezone information found, applying option() value of",
+##                  getOption("TZ"), "\n")
+##              Sys.putenv("TZ" = getOption("TZ")) 
+##          } 
+##      }
+##  }
 
 
 # ------------------------------------------------------------------------------
