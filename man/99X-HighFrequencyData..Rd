@@ -456,10 +456,7 @@ Guillaume D.M., Dacorogna M.M., Dave R.R., Mueller U.A., Olsen R.B.,
 
 
 \examples{
-## SOURCE("fBasics.A0-SPlusCompatibility")
-## SOURCE("fBasics.E5-HolidayCalendars")
-## SOURCE("fBasics.F1-HighFrequencyDataTools")
-## SOURCE("fBasics.Z1-BasicsTools")
+## SOURCE("fCalendar.99X-HighFrequencyData")
 
 ## xjulian - 
    xmpBasics("\nStart: Julian Counts > ")

@@ -49,8 +49,7 @@
 
 
 \examples{
-## SOURCE("fBasics.A0-SPlusCompatibility")
-## SOURCE("fCalendar.Z1-CalendarTools")
+## SOURCE("fCalendar.25A-CalendarData")
 }
 
 

@@ -144,9 +144,7 @@
 
 
 \examples{
-## SOURCE("fBasics.A0-SPlusCompatibility")
-## SOURCE("fBasics.E3-DaylightSavingTimeRules")
-## SOURCE("fBasics.Z1-BasicsTools")
+## SOURCE("fCalendar.23B-DaylightSavingTime")
 
 ## data - 
    xmpBasics("\nStart: DST Rules for Zurich > ")

@@ -1,13 +1,9 @@
 funCalendar 				Function Addons
 
-xmpCalDates                 Manage ISO Integer formated Dates and Holidays
-xmpCalChron                 Manage Chronological Objects from R's chron Package
-xmpCalPosix                 Manage POSIXt Objects from R's base Package
-xmpCalTimeDate              Calendar Time Date Objects
-xmpCalTimeSeries            Calendar Time Series Objects
-xmpCalHolidays              Holiday Dates and Calendars
+xmpDWChapter21              Date and Time Conventions and Standards
+xmpDWChapter22              Manage POSIXt Objects from R's base Package
+xmpDWChapter23              Calendar Time Date Objects
+xmpDWChapter24              Calendar Time Series Objects
+xmpDWChapter25				Calendarical Calculations
 
 xmpZWChapter02              Zivot-Wang Chapter 2 Time Series in S-Plus
-
-xmpXtsBusinessTime          High frquency Data on a Business Time Scales
-xmpXtsFXFilter              Parse and Filter High Freuency FX Data

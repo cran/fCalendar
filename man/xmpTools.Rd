@@ -91,8 +91,7 @@ xmpCalendar(prompt = "")
 
 
 \examples{
-## SOURCE("fBasics.A0-SPlusCompatibility")
-## SOURCE("fCalendar.Z1-CalendarTools")
+## SOURCE("fCalendar.xmpTools")
 
 ## myFinCenter -
    myFinCenter

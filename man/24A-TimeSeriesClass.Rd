@@ -31,7 +31,10 @@
 \alias{lagSeries} 
 \alias{mergeSeries}
 \alias{returnSeries}
+\alias{logSeries}
+\alias{absSeries}
 \alias{revSeries}
+\alias{outlierSeries}
 
 \alias{alignDailySeries}
 \alias{ohlcDailyPlot}
@@ -96,10 +99,13 @@
     \code{mergeSeries} \tab Merges a 'timeSeries' object with a 'matrix', \cr
     % since R 2.1 no hyphens - are allowed in tabular
     \code{ohlcDailyPlot} \tab Plots open high low close bar chart, \cr
-    \code{revSeries} \tab S3: Reverts the order of 'timeSeries' object, \cr
-    \code{diffSeries} \tab S3: Takes differences from a 'timeSeries' object, \cr
-    \code{lagSeries} \tab S3: Lags a 'timeSeries' object, \cr
-    \code{returnSeries} \tab Computes returns from a 'timeSeries' object. }
+    \code{revSeries} \tab Reverts the order of 'timeSeries' object, \cr
+    \code{diffSeries} \tab Takes differences from a 'timeSeries' object, \cr
+    \code{lagSeries} \tab Lags a 'timeSeries' object, \cr
+    \code{outlierSeries} \tab Removes outliers from a 'timeSeries' object, \cr
+    \code{returnSeries} \tab Computes returns from a 'timeSeries' object, \cr
+    \code{logSeries} \tab Returns logarithms of a 'timeSeries' object, \cr
+    \code{absSeries} \tab Returns absolute values of a 'timeSeries' object.}
         
 }
 
@@ -134,10 +140,13 @@ applySeries(x, from = NULL, to = NULL, FUN = colAvgs, units = NULL, ...)
 cutSeries(x, from, to)
 diffSeries(x, lag = 1, diff = 1, trim = FALSE, pad = NA)
 lagSeries(x, k = 1, trim = FALSE, units = NULL)
+outlierSeries(x, sd = 10, complement = TRUE)
 mergeSeries(x, y, units = NULL)
 returnSeries(x, type = c("continuous", "discrete"), percentage = FALSE, 
     trim = TRUE, digits = 4, units = NULL)
 revSeries(x)
+logSeries(x)
+absSeries(x)
     
 alignDailySeries(x, method = c("before", "after", "interp", "fillNA"), 
     include.weekends = FALSE, units = NULL)
@@ -152,6 +161,12 @@ ohlcDailyPlot(x, volume = TRUE, colOrder = c(1:5), units = 1e6,
     \item{charvec}{
         a character vector of dates and times.
         }
+    \item{complement}{
+    	[outlierSeries] - \cr
+    	a logical flag, should the outler series
+		or its complement be returns, by default \code{TRUE}
+		which returns the series free of outliers.
+		}
     \item{colOrder}{
         [ohlcDailyPlot] - \cr 
         an integer vector which gives the order of the prices and the
@@ -275,6 +290,13 @@ ohlcDailyPlot(x, volume = TRUE, colOrder = c(1:5), units = 1e6,
         a logical value. Should a grid be added to the plot? By
         default \code{TRUE}.
         } 
+    \item{sd}{
+    	[outlierSeries] - \cr
+    	a numeric value of standard deviations, e.g. 10
+		means that values larger or smaller tahn ten 
+		times the standard deviation will be removed from
+		the series.
+		}
     \item{sep}{
         [read.timeSeries] - \cr
         the field seperator used in the spreadsheet file to separate 
@@ -438,8 +460,7 @@ ohlcDailyPlot(x, volume = TRUE, colOrder = c(1:5), units = 1e6,
 
 
 \examples{
-## SOURCE("fBasics.E3-TimeSeriesClass")
-## SOURCE("fBasics.Z1-BasicsTools")
+## SOURCE("fCalendar.24A-TimeSeriesClass")
 
 ## data - 
    xmpBasics("\nStart: Load Microsoft Data > ")

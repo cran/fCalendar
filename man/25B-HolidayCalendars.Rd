@@ -399,10 +399,7 @@ Therneau T. (1991);
 
 
 \examples{
-## SOURCE("fBasics.A0-SPlusCompatibility")
-## SOURCE("fBasics.E5-HolidayCalendars")
-## SOURCE("fBasics.E6-HolidayDates")
-## SOURCE("fBasics.Z1-BasicsTools")
+## SOURCE("fCalendar.25B-HolidayCalendars")
 
 ## easter -
    xmpBasics("\nStart: Easter and Easter Related Feasts > ")

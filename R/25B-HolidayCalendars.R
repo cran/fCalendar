@@ -30,6 +30,7 @@
 ################################################################################
 # FUNCTION:           HOLIDAY CALENDAR FUNCTIONS:
 #  easter              Returns date of easter or related feasts as 'sdate'
+#  .easter.sunday       Easter Algorithm
 #  holiday             Returns a holiday date of G7 and CH as 'sdate'
 # FUNCTION:           TIME DATE HOLIDAY CALENDARS:
 #  holiday.NYSE        Returns 'timeDate' object for full-day NYSE holidays

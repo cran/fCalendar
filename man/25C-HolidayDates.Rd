@@ -273,10 +273,7 @@ JPBankHolidayDec31(year)
 
 
 \examples{
-## SOURCE("fBasics.A0-SPlusCompatibility")
-## SOURCE("fBasics.C5-HolidayCalendars")
-## SOURCE("fBasics.C6-HolidayDates")
-## SOURCE("fBasics.Z1-BasicsTools")
+## SOURCE("fCalendar.25C-HolidayDates")
 
 ## CHSechselaeuten -
    # Sechselaeuten a half Day Bank Holiday in Switzerland

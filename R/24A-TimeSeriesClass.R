@@ -29,7 +29,7 @@
 
 ################################################################################
 # FUNCTION:            GENERATION OF TIME SERIES OBJECTS:
-#  setClass             S4 Class definition for a 'timeSeries' object
+#  'timeSeries'         S4 Class definition for a 'timeSeries' object
 #  timeSeries           Creates a 'timeSeries' object from scratch
 #  read.timeSeries      Reads from a spreadsheet and creates a 'timeSeries'
 # METHODS:
@@ -59,6 +59,9 @@
 #  revSeries            Reverts a 'timeSeries' object
 #  diffSeries           Differences a 'timeSeries' object
 #  lagSeries            Lags a 'timeSeries' object
+#  outlierSeries        Removes outliers from a 'timeSeries' object
+#  logSeries            Returns logarithms of a 'timeSeries' object
+#  absSeries            Returns abolute values of a 'timeSeries' object
 # FUNCTION:            FOR DAILY OPERATIONS:
 #  alignDailySeries     Aligns a 'timeSeries' object to new positions 
 #  ohlcDailyPlot        Plots open–high–low–close bar chart         
@@ -276,6 +279,27 @@ function(x, dimnames = TRUE, format = "")
     #   Returns a S4 object of class 'timeSeries'.
     
     # FUNCTION:
+    
+    # Is it a command like "as.timeSeries(data(nyse))" ?
+    if (is.character(x)) {
+    	DATA = eval(x)
+    	DATA.FRAME = eval(parse(text = DATA))
+    	if (!is.data.frame(DATA.FRAME)) 
+    		stop(paste(DATA, "is not a valid data frame")) 
+    	# Try to find out the format:
+    	Format = as.character(DATA.FRAME[1,1])
+    	if (nchar(Format) == 8) format = "%Y%m%d"
+    	if (nchar(Format) == 10) format = "%Y-%m-%d"
+    	if (nchar(Format) == 12) format = "%Y%m%d%H%M"
+    	if (nchar(Format) == 16) format = "%Y-%m-%d %H:%M"
+    	if (format == "") stop("Could not identify format type")    
+    	data = as.matrix(DATA.FRAME[, -1])   
+    	charvec = as.character(DATA.FRAME[, 1])	                           
+		ans = timeSeries(data = data, charvec = charvec, 
+			units = colnames(DATA.FRAME)[-1], FinCenter = "GMT", 
+			zone = "GMT", format = format)		
+		return(ans)
+	}
     
     # Time Series Decoration: 
     if (dimnames) {
@@ -556,7 +580,7 @@ j = min(1, ncol(x@Data)):ncol(x@Data))
     # FUNCTION:
     
     # Check Timezone:
-    if (Sys.timezone() != "GMT") warning("Set timezone to GMT!")
+    if (Sys.getenv("TZ")[[1]] != "GMT") warning("Set timezone to GMT!")
     
     # Subsets:
     if(missing(i)) { i <- min(1, nrow(x@Data)):nrow(x@Data) }
@@ -727,6 +751,91 @@ function(x, k = 1, trim = FALSE, units = NULL)
     # Return Value:
     ans      
 }
+
+
+# ------------------------------------------------------------------------------
+
+
+outlierSeries = 
+function(x, sd = 10, complement = TRUE) 
+{	# A function implemented by Diethelm Wuertz
+    
+    # Description:
+    #   Returns outliers in a timeSeries object or the complement
+    
+    # Arguments:
+    #   x - a 'timeSeries' object.
+    #	sd - a numeric value of standard deviations, e.g. 10
+    #		means that values larger or smaller tahn ten 
+    #		times the standard deviation of the series will
+    #		be removed.
+    #	complement - a logical flag, should the outler series
+    #		or its complement be returns.
+    
+    # FUNCTION:
+    
+	# Check if univariate Series:
+	if (dim(x@Data)[2] != 1) 
+    	stop("Supports only univariate timeSeries Objects")
+    
+    # Find Outliers:
+    SD = sd * sd(x@Data)
+    if (complement) {
+	    x  = x[abs(x@Data) <= SD]
+	} else {
+		x = x[abs(x@Data) > SD]
+	}
+	
+	# Return Value:
+	x
+}
+
+
+# ------------------------------------------------------------------------------
+
+
+logSeries = 
+function(x) 
+{	# A function implemented by Diethelm Wuertz
+    
+    # Description:
+    #   Returns logarithmic values of a 'timeSeries' object
+    
+    # Arguments:
+    #   x - a 'timeSeries' object.
+    
+    # FUNCTION:
+    
+    # Absolute Values:
+    x@Data = log(x@Data)
+	
+	# Return Value:
+	x
+}
+
+
+# ------------------------------------------------------------------------------
+
+
+absSeries = 
+function(x) 
+{	# A function implemented by Diethelm Wuertz
+    
+    # Description:
+    #   Returns absolute values of a 'timeSeries' object
+    
+    # Arguments:
+    #   x - a 'timeSeries' object.
+    
+    # FUNCTION:
+    
+    # Absolute Values:
+    x@Data = abs(x@Data)
+	
+	# Return Value:
+	x
+}
+
 
 
 # ------------------------------------------------------------------------------
@@ -1289,6 +1398,9 @@ include.weekends = FALSE, units = NULL)
     #       included or removed?
     
     # FUNCTION:
+    
+    # Settings:
+    method = method[1]
     
     # Internal Function
     # Univariate Time Series Alignment:
