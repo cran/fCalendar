@@ -2,6 +2,9 @@
 
 \alias{TimeDateClass}
 
+\alias{currentYear}
+\alias{myUnits}
+
 \alias{myFinCenter}
 \alias{rulesFinCenter}
 \alias{listFinCenter}
@@ -16,7 +19,9 @@
 \alias{seq.timeDate}
 \alias{Sys.timeDate}
 
-\alias{print.timeDate}
+\alias{show.timeDate}
+\alias{show,timeDate-method}
+
 \alias{plot.timeDate}
 \alias{points.timeDate}
 \alias{lines.timeDate}
@@ -86,7 +91,8 @@ Sys.timeDate(FinCenter = myFinCenter)
 
 is.timeDate(object)
 
-\method{print}{timeDate}(x, \dots)
+show.timeDate(object)
+
 \method{plot}{timeDate}(x, y, \dots)
 \method{summary}{timeDate}(object, \dots)
 \method{format}{timeDate}(x, \dots) 
@@ -137,7 +143,7 @@ myUnits
         \code{"sort"}, \code{"round"}, or \code{"trunc"}. 
         }     
     \item{object}{
-        [is.timeData][summary] - \cr
+        [is.timeData][show][summary] - \cr
         an object of class \code{timeDate}.
         }
     \item{pattern}{
@@ -285,7 +291,7 @@ myUnits
     We have defined a 'timeDate' class which is in many aspects similar
     to the S-Plus class with the same name, but has also some important
     advantageous differeneces. The S4 class has four Slots, the \code{Data} 
-    slot which holds date and time as 'POSIXlt' objects in the standard
+    slot which holds date and time as 'POSIXct' objects in the standard
     ISO-8601 format, the \code{Dim} slot which gives the dimension
     of the data object, the \code{format} specification slot and the
     \code{FinCenter} slot which holds the name of the financial center. 
@@ -413,9 +419,14 @@ Zivot, E., Wang J. (2003);
 }
 
 
-\examples{
-## SOURCE("fCalendar.3A-TimeDateClass")
+\author{
 
+    Diethelm Wuertz for the Rmetrics \R-port.
+    
+}
+
+
+\examples{
 ## myFinCenter -
    myFinCenter
 
@@ -458,13 +469,6 @@ Zivot, E., Wang J. (2003);
    print(tC)
    summary(tC)
    format(tC)   
-}
-
-
-\author{
-
-    Diethelm Wuertz for the Rmetrics \R-port.
-    
 }
 
 

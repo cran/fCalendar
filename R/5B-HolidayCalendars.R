@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2004, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -36,6 +36,7 @@
 
 
 ################################################################################
+# FUNCTION:           HOLIDAY CALENDAR FUNCTIONS:
 #  holiday             Returns a holiday date of G7 and CH 
 #  holidayNYSE         Returns 'timeDate' object for full-day NYSE holidays
 #  holidayZURICH       Returns 'timeDate' object for ZURICH holidays

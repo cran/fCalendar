@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2004, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -40,12 +40,14 @@
 ################################################################################
 
 
-test.helpFile = 
+test.aaa = 
 function()
 {
     # Help File:
     helpFile = function() { 
-        example(TimeSeriesPositions); return() }
+        example(TimeSeriesPositions, ask = FALSE)
+        return() 
+    }
     checkIdentical(
         target = class(try(helpFile())),
         current = "NULL")
@@ -58,7 +60,7 @@ function()
 # ------------------------------------------------------------------------------
 
 
-test.positions = 
+test.seriesPositions = 
 function()
 {
     # Generate nivariate daily random sequence
@@ -76,8 +78,27 @@ function()
     attr(uTS@positions, "control")<-NULL
     checkIdentical(target = charvec, current = uTS@positions)
     
+    # Return Value:
+    return()    
+}
+
+
+# ------------------------------------------------------------------------------
+
+
+test.newPositions = 
+function()
+{
+    # Generate nivariate daily random sequence
+    set.seed(4711)
+    data = round(rnorm(12), 2)
+    charvec = timeCalendar(2006)
+    uTS = timeSeries(data, charvec, units = "uTS")
+    uTS
+    
     # Add one Day to Positions:
-    newPositions(uTS) <- POS + 24*3600
+    POS = seriesPositions(uTS)
+    newPositions(uTS) <- POS + 24*3600                     
     uTS
     
     # Return Value:
@@ -88,14 +109,14 @@ function()
 # ------------------------------------------------------------------------------
 
 
-test.timeDateOrdering = 
+test.timeSeriesOrdering = 
 function()
 {
-    #  sample.timeSeries    Resamples a 'timeSeries' object in time
-    #  sort.timeSeries      Sorts reverts a 'timeSeries' object in time
-    #  rev.timeSeries       Reverts a 'timeSeries' object in time 
-    #  start.timeSeries     Extracts start date of a 'timeSeries' object 
-    #  end.timeSeries       Extracts end date of a 'timeSeries' object
+    #  sample.timeSeries - Resamples a 'timeSeries' object in time
+    #  sort.timeSeries - Sorts reverts a 'timeSeries' object in time
+    #  rev.timeSeries - Reverts a 'timeSeries' object in time 
+    #  start.timeSeries - Extracts start date of a 'timeSeries' object 
+    #  end.timeSeries - Extracts end date of a 'timeSeries' object
     
     # Generate univariate monthly random sequence:
     set.seed(4711)
@@ -132,7 +153,8 @@ function()
 
 if (FALSE) {
     require(RUnit)
-    testResult <- runTestFile("C:/Rmetrics/SVN/trunk/fCalendar/test/runit4C.R")
+    testResult <- runTestFile("C:/Rmetrics/SVN/trunk/fCalendar/test/runit4C.R",
+        rngKind = "Marsaglia-Multicarry", rngNormalKind = "Inversion")
     printTextProtocol(testResult)
 }
 

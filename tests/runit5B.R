@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2004, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -29,38 +29,20 @@
 
 ################################################################################
 # FUNCTION:           HOLIDAY CALENDAR FUNCTIONS:
-#  easter              Returns date of easter or related feasts as '.sdate'
-#  .easter.sunday       Easter Algorithm
-#  holiday             Returns a holiday date of G7 and CH as '.sdate'
-# FUNCTION:           TIME DATE HOLIDAY CALENDARS:
-#  holiday.NYSE        Returns 'timeDate' object for full-day NYSE holidays
-# FUNCTION:           DESCRIPTION:
-#  .on.or.after        Computes date in month that is a nday ON OR AFTER date
-#  .on.or.before       Computes date in month that is a nday ON OR BEFORE date
-#  .nth.of.nday        Computes nth ocurrance of a nday in year/month
-#  .last.of.nday       Computes the last nday in year/month
-# FUNCTION:           DESCRIPTION:
-#  .sjulian            Computes Julian day numbers from ISO-8601 dates
-#  .sdate              Computes ISO-8601 dates from Julian day numbers
-#  .sday.of.week       Computes day of the week for ISO-8601 dates 
-#  .sleap.year         Returns TRUE/FALSE if dates belong to leap years or not
-#  .print.sdate        Print method for objects of class ".sdate"
-# FUNCTION:           DESCRIPTION:
-#  fjulian             Transform formatted dates to julian day numbers
-# FUNCTION:           DESCRIPTION:
-#  .julian             Implements SPlus like 'julian'
-#  month.day.year      Implements SPlus like 'month.day.year'
-#  leap.year           Implements SPlus like 'leap.year'
-#  day.of.week         Implements SPlus like 'day.of.week'
+#  holiday             Returns a holiday date of G7 and CH 
+#  holidayNYSE         Returns 'timeDate' object for full-day NYSE holidays
+#  holidayZURICH       Returns 'timeDate' object for ZURICH holidays
 ################################################################################
 
 
-test.helpFile = 
+test.aaa = 
 function()
 {
     # Help File:
     helpFile = function() { 
-        example(HolidayCalendars); return() }
+        example(HolidayCalendars, ask = FALSE)
+        return() 
+    }
     checkIdentical(
         target = class(try(helpFile())),
         current = "NULL")
@@ -73,10 +55,9 @@ function()
 # ------------------------------------------------------------------------------
 
 
-test.holidayCalendars = 
+test.holiday = 
 function()
 {
-
     # easter -
     # easter(year = currentYear, shift = 0)
     # Dates for Easter and Good Friday from 2000 until 2010:
@@ -103,14 +84,40 @@ function()
     Easter(2000:2010)                    
     GoodFriday(2000:2010)
   
-    # holiday.NYSE -
+    # Return Value:
+    return()    
+} 
+ 
+
+# ------------------------------------------------------------------------------
+
+
+test.holidayNYSE = 
+function()
+{       
+    # Holiday NYSE -
     HD = holidayNYSE(currentYear)
-    HD
+    print(HD)
     checkTrue(inherits(HD, "timeDate"))
    
     # Return Value:
+    return()   
+}
+
+
+# ------------------------------------------------------------------------------
+
+
+test.holidayZURICH = 
+function()
+{       
+    # Holiday Zurich -                              # CHECK
+    # HD = holidayZURICH(currentYear)
+    # print(HD)
+    # checkTrue(inherits(HD, "timeDate"))
+   
+    # Return Value:
     return()
-    
 }
 
 
@@ -119,7 +126,8 @@ function()
 
 if (FALSE) {
     require(RUnit)
-    testResult <- runTestFile("C:/Rmetrics/SVN/trunk/fCalendar/test/runit5B.R")
+    testResult <- runTestFile("C:/Rmetrics/SVN/trunk/fCalendar/test/runit5B.R",
+        rngKind = "Marsaglia-Multicarry", rngNormalKind = "Inversion")
     printTextProtocol(testResult)
 }
 

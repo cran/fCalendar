@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2006, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -47,12 +47,14 @@
 ################################################################################
 
 
-test.helpFile = 
+test.aaa = 
 function()
 {
     # Help File:
     helpFile = function() { 
-        example(TimeDateCoercion); return() }
+        example(TimeDateCoercion, ask = FALSE)
+        return() 
+    }
     checkIdentical(
         target = class(try(helpFile())),
         current = "NULL")
@@ -183,7 +185,7 @@ function()
     # months.timeDate = function(x, abbreviate = NULL)
     MO = months(TC) 
     MO
-    checkIdentical(as.vector(AT[,2]), as.vector(MO))    
+    checkIdentical(as.vector(AT[, 2]), as.vector(MO))    
 
         
     # Return Value:
@@ -196,7 +198,8 @@ function()
 
 if (FALSE) {
     require(RUnit)
-    testResult <- runTestFile("C:/Rmetrics/SVN/trunk/fCalendar/test/runit3E.R")
+    testResult <- runTestFile("C:/Rmetrics/SVN/trunk/fCalendar/test/runit3E.R",
+        rngKind = "Marsaglia-Multicarry", rngNormalKind = "Inversion")
     printTextProtocol(testResult)
 }
 

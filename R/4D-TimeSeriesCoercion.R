@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2004, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -53,6 +53,7 @@
 
 
 ################################################################################
+# METHODS:                  CREATE A TIMESERIES FROM OTHER OBJECTS:
 #  is.timeSeries             Tests for a 'timeSeries' object
 #  as.timeSeries             Defines method for a 'timeSeries' object
 #  as.timeSerie.default      Returns the input
@@ -62,6 +63,7 @@
 #  as.timeSeries.ts          Transforms a 'ts' object into a 'timeSeries'
 #  as.timeSeries.character   Loads and transformas from a demo file
 #  as.timeSeries.zoo         Transforms a 'zoo' object into a 'timeSeries'
+
 
 is.timeSeries = 
 function (object) 
@@ -108,9 +110,6 @@ as.timeSeries.default =
 function(x, ...)
 {   # A function implemented by Diethelm Wuertz
 
-    # Changes:
-    #
-    
     # FUNCTION:
     
     # Return Value:
@@ -125,14 +124,11 @@ as.timeSeries.numeric =
 function(x, ...)
 {   # A function implemented by Diethelm Wuertz
 
-    # Changes:
-    #
-    
     # FUNCTION:
     
     # Create a dummay daily 'timeSeries' object:
     if (is.null(dim(x))) x = matrix(x)
-    ans = dummyDailySeries(x)
+    ans = dummyDailySeries(x, ...)
     
     # Return Value:
     ans
@@ -148,20 +144,17 @@ function(x, ...)
 
     # Examples:
     #   data(bmwRet); head(as.timeSeries(data(bmwRet)))
-
-    # Changes:
-    #
-    
+ 
     # FUNCTION:
     
     # Check if the first column has a valid ISO-format:
     dummyDates = FALSE
     firstColumn = TRUE
     charvec = as.character(as.vector(x[, 1]))
-    format = .whichFormat(charvec)
+    format = .whichFormat(charvec, ...)
     if (format == "unknown") {
         charvec = rownames(x)
-        format = .whichFormat(charvec)
+        format = .whichFormat(charvec, ...)
         if (format == "unknown") {
             # warning("Could not identify timeDate Format")
             dummyDates = TRUE
@@ -169,7 +162,7 @@ function(x, ...)
             charvec = as.character(timeSequence(from = "1970-01-01", 
                 length.out = N, format = "%Y-%m-%d", zone = "GMT", 
                 FinCenter = "GMT"))
-            format = .whichFormat(charvec)
+            format = .whichFormat(charvec, ...)
         }
         firstColumn = FALSE
     }
@@ -218,9 +211,6 @@ as.timeSeries.matrix =
 function(x, ...)
 {   # A function implemented by Diethelm Wuertz
 
-    # Changes:
-    #
-    
     # FUNCTION:
     
     # As timeSeries:
@@ -239,9 +229,6 @@ as.timeSeries.ts =
 function(x, ...)
 {   # A function implemented by Diethelm Wuertz
 
-    # Changes:
-    #
-    
     # FUNCTION:
     
     # Create a dummay daily 'timeSeries' object:
@@ -261,10 +248,7 @@ function(x, ...)
 
     # Example:
     #   as.timeSeries(data(nyse))
-    
-    # Changes:
-    #
-    
+ 
     # FUNCTION:
     
     # Load Demo File - Returns a data frame:
@@ -286,9 +270,6 @@ as.timeSeries.zoo =
 function(x, ...)
 {   # A function implemented by Diethelm Wuertz
 
-    # Changes:
-    #
-    
     # FUNCTION:
     
     # as. timeSeries:
@@ -303,10 +284,11 @@ function(x, ...)
 
 
 ################################################################################ 
+# METHODS:                  TRANSFORM A TIMESERIES INTO OTHER OBJECTS:
 #  as.vector.timeSeries      Converts a univariate 'timeSeries' to a vector
 #  as.matrix.timeSeries      Converts a 'timeSeries' to a 'matrix'
-#  as.data.frame.teries      Converts a 'timeSeries' to a 'data.frame'
-#  as.ts.timeSeries          Converts a 'timeSeries' to a 'ts' 
+#  as.data.frame.timeSeries  Converts a 'timeSeries' to a 'data.frame'
+#  as.ts.timeSeries          Converts a 'timeSeries' to a 'ts'     
 
 
 as.vector.timeSeries =
@@ -321,10 +303,7 @@ function(x, mode = "any")
     
     # Value:
     #   Returns the data slot of 'timesSeries' object as a vector.
-        
-    # Changes:
-    #
-    
+
     # FUNCTION:
         
     # Check:
@@ -346,7 +325,7 @@ function(x, mode = "any")
 
 
 as.matrix.timeSeries =
-function(x) 
+function(x, ...) 
 {   # A function implemented by Diethelm Wuertz
 
     # Description:
@@ -357,10 +336,7 @@ function(x)
     
     # Value:
     #   Returns the data slot of a 'timesSeries' object as a vector.
-    
-    # Changes:
-    #
-    
+ 
     # FUNCTION:
     
     # Check:
@@ -390,10 +366,7 @@ function(x, row.names = NULL, optional = NULL, ...)
     
     # Value:
     #   Returns the data slot of a 'timesSeries' object as a data frame.
-    
-    # Changes:
-    #
-    
+ 
     # FUNCTION:
     
     # Check:
@@ -468,10 +441,7 @@ function(x, mode = "any")
     
     # Value:
     #   Returns the data of an 'zoo' object as a named vector.
-        
-    # Changes:
-    #
-    
+
     # FUNCTION:
         
     # Check:
@@ -509,10 +479,7 @@ function(x)
     
     # Example:
     #   require(tseries); as.matrix(get.hist.quote("IBM"))
-    
-    # Changes:
-    #
-    
+  
     # FUNCTION:
     
     # Check:
@@ -547,10 +514,7 @@ function(x, probs = 0.95, ...)
     
     # Examples:
     #   quantile(as.timeSeries(data(daxRet)))
-    
-    # Changes:
-    #
-    
+ 
     # FUNCTION:
     
     # Convert to timeSeries:
@@ -604,9 +568,7 @@ function(x, y, units = NULL)
     
     # Changes:
     #
-    
-    # FUNCTION:
-    
+
     # Test Input:
     if (class(x) != "timeSeries") stop("x must be a timeSeries")
     if (!is.matrix(y)) stop("y must be a matrix")

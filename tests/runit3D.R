@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2004, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -28,31 +28,26 @@
 
 
 ################################################################################
-# FUNCTION:             DESCRIPTION:
-#  ...                   Holiday Functions
-# FUNCTION:             DESCRIPTION:
-#  .holidayList          Prints all public and ecclestical holidays
-#  .easter               Returns date of easter or related feasts 
-#  .easterSunday         Easter Algorithm 
-# FUNCTION:             DESCRIPTION:
-#  .on.or.after          Computes date in month that is a nday ON OR AFTER date
-#  .on.or.before         Computes date in month that is a nday ON OR BEFORE date
-#  .nth.of.nday          Computes nth ocurrance of a nday in year/month
-#  .last.of.nday         Computes the last nday in year/month
-# FUNCTION:             DESCRIPTION:
-#  .sdate                Computes ISO-8601 dates from Julian day numbers
-#  .sjulian              Computes Julian day numbers from ISO-8601 dates
-#  .sday.of.week         Computes day of the week for ISO-8601 dates 
-#  .sleap.year           Returns TRUE/FALSE if dates belong to leap years or not
+# FUNCTION:              SPECIAL TIMEDATE OPERATIONS:
+#  timeLastDayInMonth     Computes the last day in a given month and year
+#  timeFirstDayInMonth    Computes the first day in a given month and year
+#  timeLastDayInQuarter   Computes the last day in a given quarter and year
+#  timeFirstDayInQuarter  Computes the first day in a given quarter and year
+#  timeNdayOnOrAfter      Computes date in month that is a n-day ON OR AFTER  
+#  timeNdayOnOrBefore     Computes date in month that is a n-day ON OR BEFORE  
+#  timeNthNdayInMonth     Computes n-th ocurrance of a n-day in year/month
+#  timeLastNdayInMonth    Computes the last n-day in year/month
 ################################################################################
 
 
-test.helpFile = 
+test.aaa = 
 function()
 {
     # Help File:
     helpFile = function() { 
-        example(CalendarData); return() }
+        example(TimeDateSpecDates, ask = FALSE)
+        return() 
+    }
     checkIdentical(
         target = class(try(helpFile())),
         current = "NULL")
@@ -60,35 +55,40 @@ function()
     # Return Value:
     return()    
 } 
- 
+
 
 # ------------------------------------------------------------------------------
 
 
-test.holidays =
+test.specialDates =
 function()
 {
-    holidays = as.vector(.holidayList()[,1])
-    for (holiday in holidays) {
-        Holiday = match.fun(holiday)
-        cat(as.character(Holiday(currentYear)), holiday, "\n")
-    }
+    #  timeLastDayInMonth     Computes the last day in a given month and year
+    #  timeFirstDayInMonth    Computes the first day in a given month and year
+    #  timeLastDayInQuarter   Computes the last day in a given quarter and year
+    #  timeFirstDayInQuarter  Computes the first day in a given quarter and year
+    #  timeNdayOnOrAfter      Computes date in month that is a n-day ON OR AFTER  
+    #  timeNdayOnOrBefore     Computes date in month that is a n-day ON OR BEFORE  
+    #  timeNthNdayInMonth     Computes n-th ocurrance of a n-day in year/month
+    #  timeLastNdayInMonth    Computes the last n-day in year/month
     
     # Return Value:
     return()  
 }
 
 
-# ------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
 
 
 if (FALSE) {
     require(RUnit)
-    testResult <- runTestFile("C:/Rmetrics/SVN/trunk/fCalendar/test/runit5A.R")
+    testResult <- runTestFile("C:/Rmetrics/SVN/trunk/fCalendar/test/runit3D.R",
+        rngKind = "Marsaglia-Multicarry", rngNormalKind = "Inversion")
     printTextProtocol(testResult)
 }
 
 
 ################################################################################
    
+    

@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2006, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -28,6 +28,10 @@
 
 
 ################################################################################
+# FUNCTION:              SETTINGS:
+#  currentYear            Sets date of the current year
+#  .currentYear           Sets date of the current year
+#  myUnits                Sets date units
 # FUNCTION:              FINANCIAL CENTERS:
 #  myFinCenter            Sets my financial center
 #  rulesFinCenter         Returns DST rules for a financial center
@@ -45,13 +49,61 @@
 #  Sys.timeDate           Returns system time as an object of class 'timeDate' 
 #  is.timeDate            Tests if the object is of class 'timeDate' 
 # METHODS:               REPRESENTATION OF TIMEDATE OBJECTS:
-#  print.timeDate         Prints 'timeDate' object
+#  show.timeDate          Prints 'timeDate' object
+#  .print.timeDate         Prints 'timeDate' object
 #  plot.timeDate          Plots 'timeDate' object
 #  points.timeDate        Adds points to a 'timeDate' plot
 #  lines.timeDate         Adds lines to a 'timeDate' plot
 #  summary.timeDate       Summarizes details of a 'timeDate' object
 #  format.timeDate        Formats 'timeDate' as ISO conform character string
 ################################################################################
+
+
+################################################################################  
+# FUNCTION:              SETTINGS:
+#  currentYear               Sets date of the current year
+#  .currentYear              Sets date of the current year
+#  myUnits                   Sets date units
+
+
+.currentYear = 
+function()    
+{   # A function implemented by Diethelm Wuertz
+
+    # FUNCTION:
+    
+    # Check Time Zone:
+    TZ = Sys.getenv("TZ")  
+    if (TZ[[1]] != "GMT") {
+        Sys.setenv(TZ = "GMT")
+        TZ.RESET = TRUE
+    } else {
+        TZ.RESET = FALSE
+    }
+    
+    # Current Year:
+    if (class(version) != "Sversion") {
+        currentYear = as.POSIXlt(Sys.time())$year + 1900
+    } else { 
+        currentDate = timeDate(date(), in.format="%w %m %d %H:%M:%S %Z %Y")
+        currentYear = as.integer(attr(years(currentDate), "levels"))
+    } 
+    
+    # Return Value:
+    if (TZ.RESET) Sys.setenv(TZ = TZ)
+    currentYear 
+} 
+
+# ------------------------------------------------------------------------------
+
+
+currentYear = .currentYear()
+
+
+# ------------------------------------------------------------------------------
+
+
+myUnits = "days"
 
 
 ################################################################################
@@ -116,7 +168,7 @@ function(FinCenter = myFinCenter)
         #   to "GMT" in your Windows Environment!       
         # Set Timezone to GMT:
         myTZ = Sys.getenv("TZ")  
-        Sys.putenv(TZ = "GMT")
+        Sys.setenv(TZ = "GMT")
         if (FinCenter == "") FinCenter = "GMT"      
         # Read the Rules:
         # Get IcalPath from .FirstLib
@@ -146,14 +198,14 @@ function(FinCenter = myFinCenter)
         ruleChangesGMT = strptime(paste(CCYYMMDD, hhmmss), "%Y%m%d %H%M%S")
         attr(ruleChangesGMT, "tzone") <- "GMT"      
         # Return Value:
-        Sys.putenv(TZ = myTZ)
+        Sys.setenv(TZ = myTZ)
         data.frame(ruleChanges = as.character(ruleChangesGMT), 
             offSet = hms.off) } 
     }
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     if (FinCenter == "") FinCenter = "GMT"
        
     # Match City:
@@ -161,7 +213,7 @@ function(FinCenter = myFinCenter)
     fun = match.fun(City)
     
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     fun()
 }  
 
@@ -202,7 +254,7 @@ function(pattern = "*")
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Time Zones DB:
     
@@ -215,7 +267,7 @@ function(pattern = "*")
     result = as.character(tz[grep(pattern = pattern, x = tz)])
     
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     result
 }
 
@@ -348,7 +400,7 @@ FinCenter = myFinCenter)
          
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # ISO Date/Time Format:
     isoFormat = "%Y-%m-%d %H:%M:%S"
@@ -412,7 +464,7 @@ FinCenter = myFinCenter)
             Dim = as.integer(Dim),
             format = isoFormat,
             FinCenter = useFinCenter)
-        Sys.putenv(TZ = myTZ)
+        Sys.setenv(TZ = myTZ)
         return(ans)
     }  
         
@@ -434,7 +486,7 @@ FinCenter = myFinCenter)
             Dim = as.integer(Dim),
             format = isoFormat,
             FinCenter = useFinCenter)
-        Sys.putenv(TZ = myTZ)
+        Sys.setenv(TZ = myTZ)
         return(ans)
     }    
          
@@ -456,7 +508,7 @@ FinCenter = myFinCenter)
             Dim = as.integer(Dim),
             format = isoFormat,
             FinCenter = useFinCenter)
-        Sys.putenv(TZ = myTZ)
+        Sys.setenv(TZ = myTZ)
         return(ans)
     }      
           
@@ -477,7 +529,7 @@ FinCenter = myFinCenter)
             Dim = as.integer(Dim),
             format = isoFormat ,
             FinCenter = useFinCenter)
-        Sys.putenv(TZ = myTZ)
+        Sys.setenv(TZ = myTZ)
         return(ans)
     }    
             
@@ -500,7 +552,7 @@ FinCenter = myFinCenter)
             Dim = as.integer(Dim),
             format = isoFormat,
             FinCenter = useFinCenter)
-        Sys.putenv(TZ = myTZ)
+        Sys.setenv(TZ = myTZ)
         return(ans)
     }    
             
@@ -513,7 +565,7 @@ FinCenter = myFinCenter)
 
 
 .whichFormat =
-function(charvec)
+function(charvec, silent = FALSE)
 {   # A function implemented by Diethelm Wuertz
 
     # Changes:
@@ -551,7 +603,9 @@ function(charvec)
     if (NCHAR == 14 & !SUBSTR) return("%Y%m%d%H%M%S")
     
     # STOP:
-    if (format == "unknown") warning("Unknown Format Specification")
+    if (!silent)
+        if (format == "unknown") 
+            warning("Unknown Format Specification")
      
     # Return Value:
     format
@@ -726,7 +780,7 @@ s = NULL, zone = myFinCenter, FinCenter = myFinCenter)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Check Input:
     len = c(length(m), length(d), length(y), length(h), length(min), length(s))
@@ -777,7 +831,7 @@ s = NULL, zone = myFinCenter, FinCenter = myFinCenter)
     }
     
     # Reset TimeZone:  
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     
     # Return Value:
     timeDate(charvec = charvec, format = NULL,  
@@ -833,7 +887,7 @@ length.out = NULL, format = NULL, zone = myFinCenter, FinCenter = myFinCenter)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Settings and Checks:
     if (!is.null(length.out)) to = from 
@@ -871,7 +925,7 @@ length.out = NULL, format = NULL, zone = myFinCenter, FinCenter = myFinCenter)
         zone = zone, FinCenter = FinCenter) 
         
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     ans
 }
 
@@ -935,7 +989,7 @@ function(FinCenter = myFinCenter)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     if (FinCenter == "") FinCenter = "GMT"
     
     # Get System Time:
@@ -943,7 +997,7 @@ function(FinCenter = myFinCenter)
         FinCenter = FinCenter)
         
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     ans
     
 }
@@ -973,20 +1027,21 @@ function(object)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Check Object:
     ans = inherits(object, "timeDate")
     
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     ans
 }
     
 
 ################################################################################
 # S3 METHODS:            REPRESENTATION OF TIMEDATE OBJECTS:
-#  print.timeDate         Prints 'timeDate' object
+#  show.timeDate          Prints 'timeDate' object
+#  .print.timeDate         Prints 'timeDate' object
 #  plot.timeDate          Plots 'timeDate' object
 #  points.timeDate        Adds points to a 'timeDate' plot
 #  lines.timeDate         Adds lines to a 'timeDate' plot
@@ -994,7 +1049,30 @@ function(object)
 #  format.timeDate        Formats 'timeDate' as ISO conform character string
 
 
-print.timeDate = 
+show.timeDate = 
+function(object)
+{   # A function implemented by Diethelm Wuertz
+
+    # Description:
+    #   Print method for an S4 object of class "timeDate"
+ 
+    # FUNCTION:
+       
+    # Unlike print the argument for show is 'object'.
+    x = object
+    
+    # Series:
+    .print.timeDate(x = object)
+    
+    # Return Value:
+    invisible(object)
+}
+    
+    
+setMethod("show", "timeDate", show.timeDate)
+
+
+.print.timeDate = 
 function(x, ...) 
 {   # A function implemented by Diethelm Wuertz
 
@@ -1015,14 +1093,14 @@ function(x, ...)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Print:
     cat(x@FinCenter, "\n", sep = "")
     layout = paste("[", as.character(x@Data), "]", sep = "")
     
     # timeDate:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     print(layout, quote = FALSE, ...)
     
     # Control:
@@ -1118,7 +1196,7 @@ function(object, ...)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Print:
     x = object
@@ -1131,7 +1209,7 @@ function(object, ...)
     cat("\n")
     
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     invisible(object)
 }
 
@@ -1159,14 +1237,14 @@ function(x, ...)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Format - format.POSIXlt(x, format = "", usetz = FALSE, ...) 
     ans = format.POSIXct(x@Data, ...)
     # print(x@FinCenter)    
     
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     ans
 }
 

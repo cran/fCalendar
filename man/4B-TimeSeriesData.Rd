@@ -2,6 +2,8 @@
 
 \alias{TimeSeriesData}
 
+\alias{fapply}
+\alias{aggregate.timeSeries}
 \alias{diff.timeSeries} 
 \alias{lag.timeSeries} 
 \alias{merge.timeSeries} 
@@ -19,8 +21,11 @@
 \alias{sign.timeSeries}
 \alias{quantile.timeSeries}
 
+\alias{attach.timeSeries}
+
 \alias{[.timeSeries} 
 \alias{cut.timeSeries} 
+\alias{window.timeSeries}
 \alias{head.timeSeries}
 \alias{tail.timeSeries}
 \alias{outlier.timeSeries}
@@ -48,7 +53,9 @@
     
     Functions and methods to modify 'timeSeries' objects:         
 
-    \tabular{ll}{  
+    \tabular{ll}{ 
+    \code{fapply} \tab Applies a function to 'timeSeries' windows, \cr 
+    \code{aggregate} \tab Aggregates a 'timeSeries' object, \cr
     \code{diff} \tab Takes differences from a 'timeSeries' object, \cr
     \code{lag} \tab Lags a 'timeSeries' object, \cr
     \code{merge} \tab Merges two 'timeSeries' objects, \cr
@@ -70,13 +77,20 @@
     \code{exp} \tab Returns the exponential values of a 'timeSeries' object, \cr
     \code{log} \tab Returns the logarithm of  a 'timeSeries' object, \cr
     \code{sign} \tab returns the signs of a 'timeSeries' object, \cr
-    \code{quantile.timeSeries} \tab Computes quantiles of a 'timeSeries' object. } 
+    \code{quantile} \tab Computes quantiles of a 'timeSeries' object. } 
+    
+    Functions for attaching 'timeSeries' objects: 
+    
+    \tabular{ll}{
+    \code{attach} \tab attaches a 'timeSeries' object, \cr
+    \code{detach} \tab detaches a 'timeSeries' object [see base package]. } 
     
     Functions and methods for subsetting 'timeSeries' objects: 
     
     \tabular{ll}{
     \code{"["} \tab "[" method for a 'timeSeries' object, \cr
     \code{cut} \tab Cuts a block from a 'timeSeries' object, \cr
+    \code{window} \tab Windows a piece from a 'timeSeries' object, \cr
     \code{head} \tab Returns the head of a 'timeSeries' object, \cr
     \code{tail} \tab Returns the tail of a 'timeSeries' object, \cr
     \code{outliers} \tab Removes outliers from a 'timeSeries' object. }
@@ -94,6 +108,11 @@
 
 
 \usage{
+
+fapply(x, from, to, FUN, \dots)
+
+\method{aggregate}{timeSeries}(x, by = c("monthly", "quarterly"), 
+    FUN = colMeans, units = NULL, \dots)
 \method{diff}{timeSeries}(x, lag = 1, diff = 1, trim = FALSE, pad = NA, \dots)
 \method{lag}{timeSeries}(x, k = 1, trim = FALSE, units = NULL, \dots)
 \method{merge}{timeSeries}(x, y, units = NULL, \dots)
@@ -110,9 +129,13 @@
 \method{sign}{timeSeries}(x)
 \method{quantile}{timeSeries}(x, probs = 0.95, \dots)
 
+\method{attach}{timeSeries}(what, pos = 2, name = deparse(substitute(what)), 
+    warn.conflicts = TRUE)
+
 \method{[}{timeSeries}(x, i = min(1, nrow(x@Data)):nrow(x@Data), 
     j = min(1, ncol(x@Data)):ncol(x@Data))
 \method{cut}{timeSeries}(x, from, to, \dots)
+\method{window}{timeSeries}(x, from, to, \dots)
 \method{head}{timeSeries}(x, n = 6, recordIDs = FALSE, \dots)
 \method{tail}{timeSeries}(x, n = 6, recordIDs = FALSE, \dots)
 \method{outlier}{timeSeries}(x, sd = 10, complement = TRUE, \dots)
@@ -131,6 +154,11 @@ rownames<-.timeSeries(x) <- value
         [log] - \cr
         a positive number. The base with respect to which logarithms
         are computed. Defaults to \code{e=exp(1)}.
+        }
+    \item{by}{
+        [aggregate] - \cr
+        a character string denoting the aggregation period, either 
+        \code{"monthly"} or \code{"quarterly"}.
         }
     \item{center, scale}{ 
         [scale] - \cr
@@ -158,6 +186,9 @@ rownames<-.timeSeries(x) <- value
         }
     \item{from, to}{
         starting date and end date, \code{to} must be after \code{from}.
+        }
+    \item{FUN}{
+        the function to be applied.
         }
     \item{i, j}{
         ["["] - \cr 
@@ -190,12 +221,23 @@ rownames<-.timeSeries(x) <- value
         [var] - \cr
         a logical flag. Should missing values be removed?
         By default \code{FALSE}.
+        } 
+    \item{name}{
+        [attach] - \cr    
+        alternative way to specify the database to be attached.
+        See for details \code{help(attach,package=base)}.
         }     
     \item{pad}{
         [diffSeries] - \cr
         which value should get the padded values? By default \code{NA}.
         Another choice often used would be zero.
         }
+    \item{pos}{
+        [attach] - \cr    
+        an integer specifying position in \code{search()} where to attach
+        the database. 
+        See for details \code{help(attach,package=base)}.
+        }   
     \item{probs}{
         a numeric value or numeric vector of probabilities with values 
         in \code{[0,1]}.
@@ -244,6 +286,22 @@ rownames<-.timeSeries(x) <- value
         cannot be assigne for a \code{"timeSeries"} object, the function
         \code{rownames()} will stop and return an error message.
         }
+    \item{warn.conflicts}{
+        [attach] - \cr    
+        a logical value. If \code{TRUE}, warnings are printed about 
+        conflicts from attaching the database, unless that database 
+        contains an object \code{.conflicts.OK}. A conflict is a 
+        function masking a function, or a non-function masking a 
+        non-function. 
+        See for details \code{help(attach,package=base)}.
+        }
+    \item{what}{
+        [attach] - \cr
+        database to be attached. This may currently be a timeSeries object,
+        a data.frame or a list or a R data file created with save or NULL 
+        or an environment. 
+        See for details \code{help(attach,package=base)}.
+        }
     \item{x}{
         [as] - \cr   
         a \code{matrix} type object to be converted.\cr
@@ -266,11 +324,18 @@ rownames<-.timeSeries(x) <- value
 
 \value{
 
+    \code{fapply}\cr
+    returns an object depending on the output of function \code{FUN}.
+    If \code{FUN} returns an S4 object of class \code{timeSeries} then
+    also \code{fapply} returns an S4 object of class \code{timeSeries}.
+    In all other cases \code{fapply} returns a \code{list}.
+    \cr
+    
     \code{timeSeries}\cr
     \code{read.timeSeries}\cr
     \code{as.timeSeries}
     \cr
-    return a S4 object of class \code{timeSeries}.
+    return an S4 object of class \code{timeSeries}.
     \cr
     
     \code{seriesData}\cr
@@ -291,6 +356,7 @@ rownames<-.timeSeries(x) <- value
     \code{aggregateSeries}\cr
     \code{applySeries}\cr
     \code{cutSeries}\cr
+    \code{window}\cr
     \code{mergeSeries}\cr
     \code{returnSeries}\cr
     \code{revSeries}
@@ -353,10 +419,14 @@ rownames<-.timeSeries(x) <- value
 }
 
 
+\author{
+
+    Diethelm Wuertz for the Rmetrics \R-port.
+    
+}
+
 
 \examples{
-## SOURCE("fCalendar.4B-TimeSeriesData")
-
 ## data - 
    # Create an artificial timeSeries object:
    myFinCenter <<- "GMT"
@@ -392,13 +462,6 @@ rownames<-.timeSeries(x) <- value
    OR
    OR > 0
    quantile(OR, probs = c(0.90, 0.95))
-}
-
-
-\author{
-
-    Diethelm Wuertz for the Rmetrics \R-port.
-    
 }
 
 

@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2004, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -106,10 +106,7 @@ function(x, ...)
     
     # Value:
     #   Returns a time resampled object of class 'timeSeries'.
-    
-    # Changes:
-    #
-    
+  
     # FUNCTION:
      
     # Data:
@@ -167,10 +164,7 @@ function(x, ...)
     
     # Value:
     #   Returns a time sorted object of class 'timeSeries'.
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Data:
@@ -199,7 +193,8 @@ sort.timeSeries =
 function (x, ...) 
 {
     # Index:
-    Index = sort(as.POSIXct(x@positions), index.return = TRUE)$ix
+    # Index = sort(as.POSIXct(x@positions), index.return = TRUE)$ix
+    Index = sort(x@positions, index.return = TRUE)$ix
     
     # Compose Series:
     x@positions = x@positions[Index] 
@@ -227,10 +222,7 @@ function(x)
     
     # Value:
     #   Returns a time reverted object of class 'timeSeries'.
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Data:
@@ -271,10 +263,7 @@ function(x, ...)
     
     # Value:
     #   Returns the first time/date as an object of class 'timeDate'.
-  
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # S3 Method:
@@ -301,10 +290,7 @@ function(x, ...)
     
     # Value:
     #   Returns the last time/date as an object of class 'timeDate'.
-    
-    # Changes:
-    #
-    
+ 
     # FUNCTION:
     
     # S3 Method:

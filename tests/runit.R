@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2006, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -31,13 +31,28 @@
 
 
 if (FALSE) {
+    
+    # Settings:
     require(fCalendar)
     require(RUnit)
-    testIndex = c("1A", "2A", "3A", "3B", "3C", "3E", "4A", "4B", "4C",
-        "4D", "5A", "5B", "6A")
-    testIndex = c(testIndex, "Demo")
-    File = "C:/Rmetrics/SVN/trunk/fCalendar/test/runit"
-    Protocol = "runitCalendar.txt"
+    testIndex = c(
+        "2A", # DaylightsavingTime
+        "3A", # TimeDateClass
+        "3B", # TimeDateSubsets
+        "3C", # TimeDateMathOps
+        "3E", # TimeDateSpecDates
+        "4A", # TimeSeriesClass
+        "4B", # TimeSeriesdata
+        "4C", # TimeSeriesPositions
+        "4D", # TimeSeriesCoercion
+        "4E", # TimeSeriesMissingvalues
+        "5A", # HolidayDates
+        "5B", # HolidayCalendars
+        "6A") # TimeSeriesImport
+    File = "C:/Rmetrics/SVN/trunk/fCalendar/tests/runit"
+    Protocol = "runitfCalendar.txt"
+    
+    # Perform and Save all Unit Tests:
     write("fCalendar:", file = Protocol)
     for (Index in testIndex) {
         file = paste(File, Index, ".R", sep = "")
@@ -48,8 +63,10 @@ if (FALSE) {
             file = Protocol, append = TRUE)
     } 
      
+    # Show Protocol:
     TXT = scan(Protocol, character(), blank.lines.skip = FALSE, sep = "\n")
     cat(TXT, sep = "\n")
+    
 }
 
 

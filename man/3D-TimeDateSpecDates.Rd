@@ -140,15 +140,21 @@ timeLastNdayInMonth(charvec, nday = 1, format = "\%Y-\%m-\%d",
 }
 
 
-\examples{
-## SOURCE("fCalendar.3D-TimeDateSpecDates")
+\author{
 
+    Diethelm Wuertz for the Rmetrics \R-port.
+    
+}
+
+
+\examples{
 ## Date as character String:
    charvec = "2006-04-16"
     
 ## timeLastDayInMonth-
    # What date has the last day in a month for a given date ?
-   timeLastDayInMonth(charvec, format = "\%Y-\%m-\%d", zone = myFinCenter, FinCenter = myFinCenter)
+   timeLastDayInMonth(charvec, format = "\%Y-\%m-\%d", 
+     zone = myFinCenter, FinCenter = myFinCenter)
    timeLastDayInMonth(charvec)
    timeLastDayInMonth(charvec, FinCenter = "Zurich")
    
@@ -179,13 +185,6 @@ timeLastNdayInMonth(charvec, nday = 1, format = "\%Y-\%m-\%d",
 ## timeLastNdayInMonth -
    # What date has the last Tuesday in May, 1996 ?
    timeLastNdayInMonth("1996-05-01", 2)
-}
-
-
-\author{
-
-    Diethelm Wuertz for the Rmetrics \R-port.
-    
 }
 
 

@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2004, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -28,8 +28,11 @@
 
 
 ################################################################################
-# METHOS                 MODIFICATION METHODS:
+# FUNCTION:              DESCRIPTION:
+#  fapply                 Applies a function to 'timeSeries' windows
+# METHOS:                MODIFICATION METHODS:
 #  .align.timeSeries      Aligns a timeSeries object
+#  aggregate.timeSeries   Aggregates a 'timeSeries' object
 #  diff.timeSeries        Differences a 'timeSeries' object
 #  lag.timeSeries         Lags a 'timeSeries' object
 #  merge.timeSeries       Merges two 'timeSeries' objects
@@ -37,7 +40,7 @@
 #  cumsum.timeSeries      Returns cumulated sums of 'timeSeries' objects
 #  scale.timeSeries       Centers and/or scales a 'timeSeries' object
 #  var.timeSeries         Returns variance for a 'timeSeries' object
-# METHODS                MATHEMATICAL OPERATIONS ON DATA:
+# METHODS:               MATHEMATICAL OPERATIONS ON DATA:
 #  Ops.timeSeries         Returns group 'Ops' for a 'timeSeries' object
 #  abs.timeSeries         Returns abolute values of a 'timeSeries' object
 #  sqrt.timeSeries        Returns sqrt values of a 'timeSeries' object
@@ -45,13 +48,16 @@
 #  log.timeSeries         Returns logarithms of a 'timeSeries' object
 #  sign.timeSeries        Returns the signs of a 'timeSeries' object
 #  quantile.timeSeries    Produces sample quantiles of a 'timeSeries' object
-# METHODS                SUBSETTING METHODS ON DATA:
+# METHODS:               DATABASE ATTACHEMENT:
+#  attach.timeSeries      Attaches a 'timeSeries' object
+# METHODS:               SUBSETTING METHODS ON DATA:
 #  [.timeSeries           Subsets of a 'timeSeries' object
 #  cut.timeSeries         Cuts a block from a 'timeSeries' object
+#  windows.timeSeries     Windows a piece from a 'timeSeries' object.
 #  head.timeSeries        Returns the head of a 'timeSeries' object
 #  tail.timeSeries        Returns the tail of a 'timeSeries' object
 #  outlier.timeSeries     Removes outliers from a 'timeSeries' object  
-# METHODS                DIM OPERATIONS ON DATA: 
+# METHODS:               DIM OPERATIONS ON DATA: 
 #  dim.timeSeries         Returns dimension of a 'timeSeries' object
 #  dimnames.timeDSeries   Returns dimension names of a 'timeSeries' object
 #  colnames<-.timeSeries  Assigns column names to a 'timeSeries' object
@@ -61,12 +67,135 @@
 
 
 ################################################################################
-#  .align.timeSeries    Aligns a 'timeSeries' object
-#  diff.timeSeries      Differences a 'timeSeries' object
-#  lag.timeSeries       Lags a 'timeSeries' object
-#  merge.timeSeries     Merges two 'timeSeries' objects
-#  scale.timeSeries     Centers and/or scales a 'timeSeries' object
-#  var.timeSeries       Returns variance for a 'timeSeries' object
+# FUNCTION:              DESCRIPTION:
+#  fapply                 Applies a function to 'timeSeries' windows
+
+
+fapply =
+function(x, from, to, FUN, ...)
+{   # A function implemented by Diethelm Wuertz
+    
+    # Description:
+    #   Applies a function to 'timeSeries' windows
+    
+    # Details:
+    #   This function can be used to aggregate and coursen a 
+    #   'timeSeries' object.
+    
+    # Arguments:
+    #   x - a 'timeSeries' object to be aggregated
+    #   from, to - two 'timeDate' position vectors which size the blocks
+    #   FUN - function to be applied, by default 'colAvgs'
+    
+    # Value:
+    #   Returns a S4 object of class 'timeSeries' if FUN returns 
+    #   a time series object, otherwise a list, where the entries
+    #   for each window is the output of the function FUN.
+    
+    # Notes:
+    #   The size of the 'moving' window and the selection of an
+    #   'adj'-acent endpoint are not needed, all the information
+    #   is kept in the 'from' and 'to' position vectors.
+  
+    # FUNCTION:
+    
+    # Check object:
+    if (class(x) != "timeSeries") stop("s is not a timeSeries object")
+    
+    # Monthly and Quarterly from and to:
+    if (is.null(from) & is.null(to)) {
+        if (by[1] == "monthly") {
+            # Use monthly blocks:
+            from = unique(timeFirstDayInMonth(seriesPositions(x)))
+            to = unique(timeLastDayInMonth(seriesPositions(x)))
+        } else if (by[1] == "quarterly") {
+            from = unique(timeFirstDayInQuarter(seriesPositions(x)))
+            to = unique(timeLastDayInQuarter(seriesPositions(x)))
+        } else {
+            stop("by must be eiter monthly or quarterly")
+        } 
+        from@FinCenter = to@FinCenter = FinCenter
+    }
+    
+    # Column Names:
+    colNames = units
+    
+    # Function:
+    fun = match.fun(FUN)
+    
+    # Blocks:
+    j.pos = as.POSIXct(seriesPositions(x))
+    j.from = as.POSIXct(from)
+    j.to = as.POSIXct(to)
+    
+    # Iterate:
+    y = x@Data
+    pos = seriesPositions(x)
+    rowNames = rownames(x@Data)
+    
+    # Compute for the first window ...
+    i = 1
+    test = (j.pos >= j.from[i] & j.pos <= j.to[i])
+    # make sure that cutted is a matrix ...
+    cutted = as.matrix(y[test, ])
+    ### if (sum(test)>0) rownames(cutted) <- rowNames[test]
+    ans = fun(cutted, ...)
+    
+    if (is.timeSeries(ans)) {
+        rowBind = ans
+        for (i in 2:from@Dim) {
+            test = (j.pos >= j.from[1] & j.pos <= j.to[1])
+            # make sure that cutted is a matrix ...
+            cutted = as.matrix(y[test, ])
+            ### if (sum(test)>0) rownames(cutted) <- rowNames[test]
+            ans = fun(cutted, ...)
+            rowBind = rbind(rowBind, ans) 
+        }
+        rownames(rowBind) = as.character(to)
+        if (is.null(colNames)) {
+            units = x@units 
+        } else {
+            units = colNames 
+        }
+        # Return Value:
+        ans = timeSeries(data = rowBind, charvec = as.character(to), 
+            units = units, format = format, zone = zone, FinCenter = 
+            FinCenter, recordIDs = recordIDs, title = title, 
+            documentation = documentation, ...) 
+        return(ans)
+    } else {  
+        listBind = list()
+        listBind[1] = ans
+        for (i in 2:from@Dim) {
+            test = (j.pos >= j.from[i] & j.pos <= j.to[i])
+            # make sure that cutted is a matrix ...
+            cutted = as.matrix(y[test, ])
+            ### if (sum(test)>0) rownames(cutted) <- rowNames[test]
+            ans = fun(cutted, ...)
+            listBind[i] = ans 
+        }
+        # Return Value:
+        ans = listBind
+        attr(ans, "control") <- list(x = x, from = from, to = to)
+        return(invisible(ans))
+    }
+    
+    # Return Value:
+    return()
+} 
+
+
+################################################################################
+# METHOS:                MODIFICATION METHODS:
+#  .align.timeSeries      Aligns a timeSeries object
+#  aggregate.timeSeries   Aggregates a 'timeSeries' object
+#  diff.timeSeries        Differences a 'timeSeries' object
+#  lag.timeSeries         Lags a 'timeSeries' object
+#  merge.timeSeries       Merges two 'timeSeries' objects
+#  rbind.timeSeries       Binds rows of two 'timeSeries' objects
+#  cumsum.timeSeries      Returns cumulated sums of 'timeSeries' objects
+#  scale.timeSeries       Centers and/or scales a 'timeSeries' object
+#  var.timeSeries         Returns variance for a 'timeSeries' object
 
 
 .align.timeSeries = 
@@ -130,6 +259,96 @@ by = "30 m")
 # ------------------------------------------------------------------------------
 
 
+aggregate.timeSeries =
+function(x, by = c("monthly", "quarterly"), FUN = colMeans, units = NULL, ...)
+{   # A function implemented by Diethelm Wuertz
+    
+    # Description:
+    #   Aggregates a 'timeSeries' object
+    
+    # Details:
+    #   This function can be used to aggregate and coursen a 
+    #   'timeSeries' object.
+    
+    # Arguments:
+    #   x - a 'timeSeries' object to be aggregated
+    #   by - calendarical block, only active when both 'from' 
+    #       and 'to' are NULL
+    #   FUN - function to be applied, by default 'colAvgs'
+    #   units - a character vector with column names, allows to 
+    #       overwrite the column names of the input 'timeSeries'
+    #       object.
+    
+    # Value:
+    #   Returns a S4 object of class 'timeSeries'.
+
+    # FUNCTION:
+    
+    # Settings:
+    format = x@format
+    zone = x@FinCenter
+    FinCenter = x@FinCenter
+    recordIDs = data.frame()
+    title = x@title
+    documentation = x@documentation
+    
+    # Check object:
+    stopifnot(is.timeSeries(x))
+    
+    # Monthly and Quarterly from and to timeDate Objects:
+    if (by[1] == "monthly") {
+        # Use monthly blocks:
+        from = unique(timeFirstDayInMonth(seriesPositions(x)))
+        to = unique(timeLastDayInMonth(seriesPositions(x)))
+    } else if (by[1] == "quarterly") {
+        from = unique(timeFirstDayInQuarter(seriesPositions(x)))
+        to = unique(timeLastDayInQuarter(seriesPositions(x)))
+    } else {
+        stop("by must be eiter monthly or quarterly")
+    } 
+    from@FinCenter = to@FinCenter = FinCenter
+    
+    # Column Names:
+    colNames = units
+    
+    # Function:
+    fun = match.fun(FUN)
+    
+    # Blocks:
+    j.pos = as.POSIXct(seriesPositions(x))
+    j.from = as.POSIXct(from)
+    j.to = as.POSIXct(to)
+    
+    # Iterate:
+    y = x@Data
+    pos = seriesPositions(x)
+    rowNames = rownames(x@Data)
+    rowBind = NULL
+    for (i in 1:from@Dim) {
+        test = (j.pos >= j.from[i] & j.pos <= j.to[i])
+        # make sure that cutted is a matrix ...
+        cutted = as.matrix(y[test, ])
+        ### if (sum(test)>0) rownames(cutted) <- rowNames[test]
+        ans = fun(cutted, ...)
+        rowBind = rbind(rowBind, ans) 
+    }
+    rownames(rowBind) = as.character(to)
+    if (is.null(colNames)) {
+        units = x@units 
+    } else {
+        units = colNames 
+    }
+    
+    # Return Value:
+    timeSeries(data = rowBind, charvec = as.character(to), units = units, 
+        format = format, zone = zone, FinCenter = FinCenter, recordIDs = 
+        recordIDs, title = title, documentation = documentation, ...)       
+} 
+
+
+# ------------------------------------------------------------------------------
+
+
 diff.timeSeries = 
 function(x, lag = 1, diff = 1, trim = FALSE, pad = NA, ...) 
 {   # A function implemented by Diethelm Wuertz
@@ -150,10 +369,7 @@ function(x, lag = 1, diff = 1, trim = FALSE, pad = NA, ...)
 
     # Value:
     #   Returns a differenced object of class 'timeSeries'.
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
         
     # Convert:
@@ -208,10 +424,7 @@ function(x, k = 1, trim = FALSE, units = NULL, ...)
     
     # Value:
     #   Returns a lagged object of class 'timeSeries'.
- 
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Column Names:
@@ -298,10 +511,7 @@ function(x, y, units = NULL, ...)
  
     # Value:
     #   Returns a S4 object of class 'timeSeries'.
-    
-    # Changes:
-    #
-    
+ 
     # FUNCTION:
     
     # Manipulate in matrix form:
@@ -370,10 +580,7 @@ function (x)
 
     # Description:
     #   Returns cumulated sums of 'timeSeries' objects
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Cumulate:
@@ -399,10 +606,7 @@ function(x, ...)
     
     # Value:
     #   Returns a reverted object of class 'timeSeries'.
-    
-    # Changes:
-    #
-    
+ 
     # FUNCTION:
     
     # Revert:
@@ -436,9 +640,6 @@ function(x, center = TRUE, scale = TRUE)
     # Description:
     #   Centers and/or scales a 'timeSeries' object.
 
-    # Changes:
-    #
-    
     # FUNCTION:
     
     # Scale:
@@ -486,11 +687,13 @@ function (x, y = NULL, na.rm = FALSE, use)
 
 
 ################################################################################
+# METHODS:               MATHEMATICAL OPERATIONS ON DATA:
 #  Ops.timeSeries         Returns group 'Ops' for a 'timeSeries' object
 #  abs.timeSeries         Returns abolute values of a 'timeSeries' object
 #  sqrt.timeSeries        Returns sqrt values of a 'timeSeries' object
 #  exp.timeSeries         Returns exponentials of a 'timeSeries' object
 #  log.timeSeries         Returns logarithms of a 'timeSeries' object
+#  sign.timeSeries        Returns the signs of a 'timeSeries' object
 #  quantile.timeSeries    Produces sample quantiles of a 'timeSeries' object
 
 
@@ -506,10 +709,7 @@ function(e1, e2 = 1)
     
     # Value:
     #   Returns an object of class 'timeSeries'.
-
-    # Changes:
-    #
-    
+  
     # FUNCTION:
     
     # Save:
@@ -575,10 +775,7 @@ function(x)
     
     # Arguments:
     #   x - a 'timeSeries' object.
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Absolute Values:
@@ -601,10 +798,7 @@ function(x)
     
     # Arguments:
     #   x - a 'timeSeries' object.
-    
-    # Changes:
-    #
-    
+  
     # FUNCTION:
     
     # Absolute Values:
@@ -627,10 +821,7 @@ function(x)
     
     # Arguments:
     #   x - a 'timeSeries' object.
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Absolute Values:
@@ -653,10 +844,7 @@ function(x, base = exp(1))
     
     # Arguments:
     #   x - a 'timeSeries' object.
-    
-    # Changes:
-    #
-    
+ 
     # FUNCTION:
     
     # Absolute Values:
@@ -676,10 +864,7 @@ function(x)
 
     # Description:
     #   Returns the signs of a 'timeSeries' object
-    
-    # Changes:
-    #
-    
+  
     # FUNCTION:
     
     # Which sign ?
@@ -722,11 +907,35 @@ function(x, probs = 0.95, ...)
 
 
 ################################################################################
+# METHODS:               DATABASE ATTACHEMENT:
+#  attach.timeSeries      Attaches a 'timeSeries' object
+
+
+attach.timeSeries = 
+function(what, pos = 2, name = deparse(substitute(what)), 
+warn.conflicts = TRUE) 
+{   # A function implemented by Diethelm Wuertz
+
+    # Description:
+    #   Attaches a 'timeSeries' object   
+    
+    # FUNCTION:
+    
+    # Convert to data.frame Object:    
+    what.df = as.data.frame(what)
+    
+    # Attach:
+    return(attach.default(what.df, pos, name, warn.conflicts))
+}
+
+
+################################################################################
+# METHODS:               SUBSETTING METHODS ON DATA:
 #  [.timeSeries           Subsets of a 'timeSeries' object
 #  cut.timeSeries         Cuts a block from a 'timeSeries' object
 #  head.timeSeries        Returns the head of a 'timeSeries' object
 #  tail.timeSeries        Returns the tail of a 'timeSeries' object
-#  outlier.timeSeries     Removes outliers from a 'timeSeries' object 
+#  outlier.timeSeries     Removes outliers from a 'timeSeries' object  
 
 
 "[.timeSeries" =
@@ -743,16 +952,13 @@ j = min(1, ncol(x@Data)):ncol(x@Data))
     
     # Value:
     #   Returns a subset from an object 'timeSeries'.
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Check Timezone:
     TZ = Sys.getenv("TZ")  
     if (TZ[[1]] != "GMT") {
-        Sys.putenv(TZ = "GMT")
+        Sys.setenv(TZ = "GMT")
         TZ.RESET = TRUE
     } else {
         TZ.RESET = FALSE
@@ -775,7 +981,7 @@ j = min(1, ncol(x@Data)):ncol(x@Data))
         
     
     # Return Value:
-    if (TZ.RESET) Sys.putenv(TZ = TZ)
+    if (TZ.RESET) Sys.setenv(TZ = TZ)
     x
 }         
 
@@ -797,10 +1003,7 @@ function (x, from, to, ...)
     
     # Value:
     #   Returns a S4 object of class 'timeSeries'.
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     from = timeDate(from)
@@ -836,10 +1039,7 @@ function(x, from, to, ...)
     
     # Value:
     #   Returns a S4 object of class 'timeSeries'.
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Check:
@@ -869,6 +1069,48 @@ function(x, from, to, ...)
 # ------------------------------------------------------------------------------
 
 
+window.timeSeries =  
+function (x, from, to, ...) 
+{   # A function implemented by Diethelm Wuertz
+
+    # Description:
+    #   Windows a piece from a 'timeSeries' object.
+    
+    # Arguments:
+    #   x - a 'timeSeries' object
+    #   from, to - two 'timeDate' position vectors which size the 
+    #       blocks
+    
+    # Details:
+    #   from and to, are both included in the window.
+    
+    # Value:
+    #   Returns a S4 object of class 'timeSeries'.
+
+    # FUNCTION:
+    
+    from = timeDate(from)
+    to = timeDate(to)
+    Positions = seriesPositions(x)
+    Units = x@units
+    colNames = colnames(x@Data)
+    test = (Positions >= from & Positions <= to)
+    Data = as.matrix(x@Data)[test, ]
+    Data = as.matrix(Data)
+    x@Data = Data
+    x@positions = x@positions[test]
+    x@units = Units
+    x@recordIDs = data.frame()
+    colnames(x@Data) = colNames
+    
+    # Return value:
+    x
+}
+
+
+# ------------------------------------------------------------------------------
+
+
 head.timeSeries = 
 function(x, n = 6, recordIDs = FALSE, ...)
 {   # A function implemented by Diethelm Wuertz
@@ -881,10 +1123,7 @@ function(x, n = 6, recordIDs = FALSE, ...)
     
     # Value:
     #   Returns the head of an object of class 'timeSeries'.
- 
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Head:
@@ -919,9 +1158,6 @@ function(x, n = 6, recordIDs = FALSE, ...)
     # Value:
     #   Returns the tail of an object of class 'timeSeries'.
  
-    # Changes:
-    #
-    
     # FUNCTION:
     
     # Tail:
@@ -958,10 +1194,7 @@ function(x, sd = 10, complement = TRUE, ...)
     #       be removed.
     #   complement - a logical flag, should the outler series
     #       or its complement be returns.
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Check if univariate Series:
@@ -982,11 +1215,12 @@ function(x, sd = 10, complement = TRUE, ...)
 
 
 ################################################################################
+# METHODS:               DIM OPERATIONS ON DATA: 
 #  dim.timeSeries         Returns dimension of a 'timeSeries' object
 #  dimnames.timeDSeries   Returns dimension names of a 'timeSeries' object
 #  colnames<-.timeSeries  Assigns column names to a 'timeSeries' object
 #  rownames<-.timeSeries  Assigns row names to a 'timeSeries' object
-#  is.array.timeSeries    Allows that NCOL and NROW work properly
+#  is.array.timeSeries    Allows that NCOL and NROW work properly 
 
 
 dim.timeSeries =
@@ -995,10 +1229,7 @@ function(x)
 
     # Description:
     #   Returns the dimension of a 'timeSeries' object
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Dimension:
@@ -1018,10 +1249,7 @@ function(x)
 
     # Description:
     #   Returns the dimension names of a 'timeSeries' object
-   
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Dimension Names:
@@ -1041,10 +1269,7 @@ function(x, value)
 
     # Description:
     #   Assigns column names to a 'timeSeries' object
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Assign Column Names:
@@ -1077,10 +1302,7 @@ function(x, value)
 
     # Description:
     #   Assigns row names to a 'timeSeries' object
-    
-    # Changes:
-    #
-    
+
     # FUNCTION:
     
     # Assign Row Names:
@@ -1115,10 +1337,7 @@ function(x)
 
     # Description:
     #   Allows that NCOL and NROW work properly
-   
-    # Changes:
-    #
-    
+  
     # FUNCTION:
     
     # Is an array:

@@ -74,7 +74,6 @@ difftimeDate(time1, time2,
 
 \arguments{
   
-
     \item{differences}{
         [lag] - \cr
         an integer indicating the order of the difference.
@@ -178,9 +177,14 @@ difftimeDate(time1, time2,
 }
 
 
-\examples{
-## SOURCE("fCalendar.3C-TimeDateMathOps")   
+\author{
 
+    Diethelm Wuertz for the Rmetrics \R-port.
+    
+}
+
+
+\examples{
 ## c -
    # Create Character Vectors:
    dts = c("1989-09-28", "2001-01-15", "2004-08-30", "1990-02-09")
@@ -215,13 +219,6 @@ difftimeDate(time1, time2,
    c(ZUR[1:2], GMT[1:2])
    rep(ZUR[2], times = 3)
    rep(ZUR[2:3], times = 2)  
-}
-
-
-\author{
-
-    Diethelm Wuertz for the Rmetrics \R-port.
-    
 }
 
 

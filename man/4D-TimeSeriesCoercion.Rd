@@ -63,7 +63,7 @@ is.timeSeries(object)
 \method{as.timeSeries}{zoo}(x, \dots)
  
 \method{as.vector}{timeSeries}(x, mode = "any")
-\method{as.matrix}{timeSeries}(x)
+\method{as.matrix}{timeSeries}(x, \dots)
 \method{as.data.frame}{timeSeries}(x, row.names = NULL, optional = NULL, \dots)
 \method{as.ts}{timeSeries}(x, \dots)
 }
@@ -120,9 +120,14 @@ is.timeSeries(object)
 }
 
 
-\examples{
-## SOURCE("fCalendar.4D-TimeSeriesCoercion")
+\author{
 
+    Diethelm Wuertz for the Rmetrics \R-port.
+    
+}
+
+
+\examples{
 ## data - timeSeries:
    # Create an artificial timeSeries object:
    myFinCenter <<- "GMT"
@@ -145,13 +150,6 @@ is.timeSeries(object)
    as.ts(TS)
 }
    
-
-\author{
-
-    Diethelm Wuertz for the Rmetrics \R-port.
-    
-}
-
 
 \keyword{chron}
 

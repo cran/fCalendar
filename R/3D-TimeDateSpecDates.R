@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2006, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -38,6 +38,18 @@
 #  timeNthNdayInMonth     Computes n-th ocurrance of a n-day in year/month
 #  timeLastNdayInMonth    Computes the last n-day in year/month
 ################################################################################
+
+
+################################################################################
+# FUNCTION:              SPECIAL TIMEDATE OPERATIONS:
+#  timeLastDayInMonth     Computes the last day in a given month and year
+#  timeFirstDayInMonth    Computes the first day in a given month and year
+#  timeLastDayInQuarter   Computes the last day in a given quarter and year
+#  timeFirstDayInQuarter  Computes the first day in a given quarter and year
+#  timeNdayOnOrAfter      Computes date in month that is a n-day ON OR AFTER  
+#  timeNdayOnOrBefore     Computes date in month that is a n-day ON OR BEFORE  
+#  timeNthNdayInMonth     Computes n-th ocurrance of a n-day in year/month
+#  timeLastNdayInMonth    Computes the last n-day in year/month
 
 
 timeLastDayInMonth = 
@@ -65,7 +77,7 @@ FinCenter = myFinCenter)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     if (FinCenter == "") FinCenter = "GMT"
     
     # Last day of month:
@@ -77,7 +89,7 @@ FinCenter = myFinCenter)
     lt$mday = last.day[1 + lt$mon] + leap.day
     
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     timeDate(lt, format = "%Y-%m-%d", zone = zone, FinCenter = FinCenter)
 }
 
@@ -100,7 +112,7 @@ FinCenter = myFinCenter)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     if (FinCenter == "") FinCenter = "GMT"
     
     # First Day In Month:
@@ -108,7 +120,7 @@ FinCenter = myFinCenter)
     lt$mday = 1
 
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     timeDate(lt, format = "%Y-%m-%d", zone = zone, FinCenter = FinCenter)
 }
 
@@ -135,19 +147,19 @@ FinCenter = myFinCenter)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     if (FinCenter == "") FinCenter = "GMT"
     
     # Last Day in Quarter:
     lt = strptime(charvec, format)
     last.quarter = rep(c(3,6,9,12), each = 3) - 1
     lt$mon = last.quarter[1 + lt$mon] 
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     charvec = timeDate(lt, format = "%Y-%m-%d", zone = zone, 
         FinCenter = FinCenter)
         
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     timeLastDayInMonth(charvec = charvec, format = format, 
         zone = zone, FinCenter = FinCenter)
 }
@@ -175,7 +187,7 @@ FinCenter = myFinCenter)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     if (FinCenter == "") FinCenter = "GMT"
     
     # First Day in Quarter:
@@ -184,7 +196,7 @@ FinCenter = myFinCenter)
     lt$mon = first.quarter[1 + lt$mon] 
 
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     timeDate(lt, format = "%Y-%m-%d", zone = zone, FinCenter = FinCenter)
 }
 
@@ -227,7 +239,7 @@ FinCenter = myFinCenter)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     if (FinCenter == "") FinCenter = "GMT"
     
     # timeDate:
@@ -238,7 +250,7 @@ FinCenter = myFinCenter)
     class(ct) = "POSIXct"
     
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     timeDate(format(ct), format = format, zone = zone, 
         FinCenter = FinCenter)
 }
@@ -278,7 +290,7 @@ FinCenter = myFinCenter)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     if (FinCenter == "") FinCenter = "GMT"
     
     # timeDate:
@@ -289,7 +301,7 @@ FinCenter = myFinCenter)
     class(ct) = "POSIXct"
     
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     timeDate(format(ct), format = format, zone = zone, 
         FinCenter = FinCenter)
 }
@@ -332,7 +344,7 @@ FinCenter = myFinCenter)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     if (FinCenter == "") FinCenter = "GMT"
     
     # timeDate:
@@ -346,7 +358,7 @@ FinCenter = myFinCenter)
     class(ct) = "POSIXct"
 
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     timeDate(format(ct), format = format, zone = zone, 
         FinCenter = FinCenter)
 }
@@ -387,7 +399,7 @@ FinCenter = myFinCenter)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     if (FinCenter == "") FinCenter = "GMT"
     
     # Last Day:
@@ -401,7 +413,7 @@ FinCenter = myFinCenter)
     class(ct) = "POSIXct"
 
     # Return Value:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     timeDate(format(ct), format = format, zone = zone,
         FinCenter = FinCenter)
 }

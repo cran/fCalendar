@@ -308,10 +308,14 @@ show.fWEBDATA(object)
 }
 
 
+\author{
+
+    Diethelm Wuertz for the Rmetrics \R-port.
+}
+
+
 \examples{
 \dontrun{
-## SOURCE("fcALENDAR.6A-TimeSeriesImport")
-
 ## economagicImport -
    USDEUR = economagicImport(query = "fedny/day-fxus2eu", 
      frequency = "daily", colname = "USDEUR")
@@ -338,12 +342,6 @@ show.fWEBDATA(object)
    DPRIME = fredImport("DPRIME")
    if (!is.null(DPRIME)) print(DPRIME@data[1:20, ])       
 }
-}
-
-
-\author{
-
-    Diethelm Wuertz for the Rmetrics \R-port.
 }
 
 

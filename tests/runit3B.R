@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2006, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -45,12 +45,14 @@
 ################################################################################
 
 
-test.helpFile = 
+test.aaa = 
 function()
 {
     # Help File:
     helpFile = function() { 
-        example(TimeDateSubsets); return() }
+        example(TimeDateSubsets, ask = FALSE)
+        return() 
+    }
     checkIdentical(
         target = class(try(helpFile())),
         current = "NULL")
@@ -63,7 +65,7 @@ function()
 # ------------------------------------------------------------------------------
 
 
-test.subsetTests = 
+test.timeDateSubsets = 
 function()
 {   
     #  isWeekday              Tests if a date is a weekday or not
@@ -140,7 +142,7 @@ function()
 # ------------------------------------------------------------------------------
 
 
-test.subsetExtracts = 
+test.extractSubsets = 
 function()
 {   
     #  [.timeDate             Extracts or replaces subsets from 'timeDate' objects
@@ -149,6 +151,9 @@ function()
     #  end.timeDate           Extracts the last entry of a 'timeDate' object
     #  blockStart             Creates start dates for equally sized blocks
     #  blockEnd               Creates end dates for equally sized blocks
+    
+    # Holidays:
+    tS = timeSequence(from = Easter(2006)-7*24*3600, length.out = 8)
     
     # [ - Subsetting:
     tS[c(1, 6:8)]   
@@ -175,7 +180,7 @@ function()
     print(target)
     checkIdentical(
         format(target), 
-        current = format(timeDate("2006-01-01")))
+        current = format(timeDate("2007-01-01")))
     
     # end -
     tS = timeCalendar() 
@@ -183,7 +188,7 @@ function()
     print(target)
     checkIdentical(
         format(target), 
-        current = format(timeDate("2006-12-01")))
+        current = format(timeDate("2007-12-01")))
     
     # head | tail -
     tS = timeCalendar()
@@ -195,7 +200,7 @@ function()
     # order.timeDate - not yet available
     sample(tS)
     unique(tS)
-    # unique(sort(c(tS, tS)))
+    unique(sort(c(tS, tS)))
    
     # Return Value:
     return()
@@ -207,7 +212,8 @@ function()
 
 if (FALSE) {
     require(RUnit)
-    testResult <- runTestFile("C:/Rmetrics/SVN/trunk/fCalendar/test/runit3B.R")
+    testResult <- runTestFile("C:/Rmetrics/SVN/trunk/fCalendar/test/runit3B.R",
+        rngKind = "Marsaglia-Multicarry", rngNormalKind = "Inversion")
     printTextProtocol(testResult)
 }
 

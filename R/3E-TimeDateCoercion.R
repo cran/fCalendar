@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2006, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -48,6 +48,7 @@
 
 
 ################################################################################
+# S3 MEHOD:              COERCION AND OBJECT TRANSFORMATIONS:
 #  as.timeDate            Use Method
 #  as.timeDate.POSIXt     Returns a 'POSIX' object as 'timeDate' object
 #  as.timeDate.Date       Returns a 'POSIX' object as 'timeDate' object
@@ -151,6 +152,7 @@ function(x, zone = myFinCenter, FinCenter = myFinCenter)
 
 
 ################################################################################
+# S3 METHOD:             DESCRIPTION:
 #  as.character.timeDate  Returns a 'timeDate' object as 'character' string
 #  as.double.timeDate     Returns a 'timeDate' object as 'numeric' object
 #  as.data.frame.timeDate Returns a 'timeDate' object as 'data.frame' object
@@ -180,7 +182,7 @@ function(x, ...)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Check Class Type:
     if (!inherits(x, "timeDate")) stop("Wrong class type")
@@ -190,7 +192,7 @@ function(x, ...)
     attr(ans, "control") = c(FinCenter = x@FinCenter)
     
     # Reset Time Zone: 
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     
     # Return Value: 
     ans
@@ -222,7 +224,7 @@ function(x, units = c("auto", "secs", "mins", "hours", "days", "weeks"), ...)
     
     # Set time zone to GMT:
     myTZ = Sys.getenv("TZ")
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # as double:
     ct = timeDate(x, zone = x@FinCenter, FinCenter = "GMT")@Data
@@ -240,7 +242,7 @@ function(x, units = c("auto", "secs", "mins", "hours", "days", "weeks"), ...)
         attr(ans, "origin")<-"1970-01-01 GMT"
     
     # Reset Time Zone:
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     
     # Return Value:
     ans   
@@ -270,7 +272,7 @@ function(x, ...)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Check Class Type:
     stopifnot(inherits(x, "timeDate"))
@@ -281,7 +283,7 @@ function(x, ...)
     attr(ans, "control") = c(FinCenter = x@FinCenter)
     
     # Reset Time Zone: 
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     
     # Return Value: 
     ans
@@ -313,7 +315,7 @@ function(x, tz = "")
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Check Class Type:
     if (!inherits(x, "timeDate")) stop("Wrong class type")
@@ -323,7 +325,7 @@ function(x, tz = "")
     attr(ans, "control") = c(FinCenter = x@FinCenter)
     
     # Reset Time Zone: 
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     
     # Return Value: 
     ans
@@ -403,6 +405,7 @@ function(x, method = c("trunc", "round", "next"), ...)
 
 
 ################################################################################
+# S3 METHOD:             DESCRIPTION:
 #  julian.timeDate        Returns Julian day counts since 1970-01-01
 #  atoms.timeDate         Returns date/time atoms from a 'timeDate' object
 #  months.timeDate        Extract months atom from a 'timeDate' object
@@ -436,7 +439,7 @@ zone = NULL, FinCenter = NULL, ...)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Check Class Type:
     stopifnot(is.timeDate(x))
@@ -454,7 +457,7 @@ zone = NULL, FinCenter = NULL, ...)
     ans = structure(res, origin = origin)
         
     # Reset Time Zone: 
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     
     # Return Value: 
     ans
@@ -486,7 +489,7 @@ function(x, ...)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Check Class Type:
     if (!inherits(x, "timeDate")) stop("Wrong class type")
@@ -505,7 +508,7 @@ function(x, ...)
     attr(ans, "control") = c(FinCenter = x@FinCenter)
     
     # Reset Time Zone: 
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     
     # Return Value: 
     ans
@@ -538,7 +541,7 @@ function(x, abbreviate = NULL)
     
     # Set Timezone to GMT:
     myTZ = Sys.getenv("TZ")  
-    Sys.putenv(TZ = "GMT")
+    Sys.setenv(TZ = "GMT")
     
     # Check Class Type:
     if (!inherits(x, "timeDate")) stop("Wrong class type")
@@ -548,7 +551,7 @@ function(x, abbreviate = NULL)
     attr(ans, "control") = c(FinCenter = x@FinCenter)
     
     # Reset Time Zone: 
-    Sys.putenv(TZ = myTZ)
+    Sys.setenv(TZ = myTZ)
     
     # Return Value: 
     ans

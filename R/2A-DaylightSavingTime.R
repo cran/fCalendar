@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2004, Diethelm Wuertz, GPL
+#   1999 - 2007, Diethelm Wuertz, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -28,9 +28,6 @@
 
 
 ################################################################################
-
-
-################################################################################
 # The following DST Rules were extracted from Libical library and 
 # integrated into R functions. 
 # Libical is an Open Source implementation of the iCalendar protocols
@@ -39,10 +36,6 @@
 # Library General Public License. 
 ################################################################################
 
-
-# Changes:
-#  
-    
 
 # AFRICA -----------------------------------------------------------------------
 
