@@ -2,9 +2,11 @@
 #
 # Example:
 #   Test functions and methods for holiday calendar management
+#	and time zone changes
 #
 # Author:
 #	(C) 2004, Diethelm Wuertz, GPL
+#	(C) 2005, Diethelm Wuertz, GPL
 #
 
 
@@ -58,7 +60,7 @@
 
    # Start with character string:
    charvec = "2004-08-01 00:00:00"
-   # Greenwich mean Time:
+   # Greenwich Mean Time:
    GMT = timeDate(charvec, zone = "GMT", FinCenter = "GMT")
    GMT
    # From GMT to local Zurich time:
@@ -85,8 +87,8 @@
    # [1] "1980-04-05 16:00:00" "1980-04-06 16:00:00"
    # [1] "Europe/Berlin"
    # [1] [1980-04-05 16:00:00] [1980-04-06 17:00:00]
-   # Note, in 1980 Switzerland had no Daylight Saving Time in 
-   # contrast, to GermaNYC!
+   # Note, in 1980 Switzerland had no Daylight Savings Time in 
+   # contrast, to Germany!
 
 
 ################################################################################
@@ -98,12 +100,17 @@
             "28 02:00:00", "28 02:15:00", "28 02:30:00", "28 02:45:00",
             "28 03:00:00", "28 03:15:00", "28 03:30:00", "28 03:45:00",
             "28 04:00:00", "28 04:15:00", "28 04:30:00", "28 04:45:00"  )
-   GMT = paste("2004-03-", TIME, sep="")
+   GMT = paste("2004-03-", TIME, sep = "")
    LONDON = timeDate(GMT, zone = "GMT", FinCenter = "Europe/London")
    GMT2 = timeDate(LONDON, zone = "Europe/London", FinCenter = "GMT")
    # Print:
    cbind(GMT, LONDON=as.character(LONDON@Data), GMT2=as.character(GMT2@Data))
-
+   ###
+   
+   # Check the other way around in Autumn!
+   # Has still to be implemented ..
+   ###
+   
 
 ################################################################################
 # Some Additional Time Zone Abbreviations:

@@ -49,6 +49,11 @@
 # S3 METHODS:          TEST AND REPRESENTATION OF OBJECTS:
 #  is.timeDate          Checks if the object is of class 'timeDate'
 #  format.timeDate      Formats 'timeDate' as ISO conform character string
+# FUNCTIONS:           DESCRIPTION:
+#  isWeekday            Tests if a date is a weekday or not
+#  isWeekend            Tests if a date falls on a weekend or not
+#  isBizday             Tests if a date is a business day or not
+#  weekDay              Returns the day of the week
 ################################################################################
 
 # IMPORTANT FOR WINDOWS USERS:
@@ -291,13 +296,16 @@ function(charvec, format = NULL, zone = "GMT", FinCenter = myFinCenter)
     #   charvec - a character vector of dates and times.
     #   format - the format specification of the input character 
     #       vector.
-    #   zone - the time zone or financial center where the data were 
-    #       recorded.
-    #   FinCenter - a character string with the the location of the  
-    #       financial center named as "continent/city". 
+    #   zone - the time zone or financial center where the data  
+    #       were recorded.
+    #   FinCenter - a character string with the the location of   
+    #       the financial center named as "continent/city". 
     
     # Value:
     #   Returns a S4 object of class 'timeDate'.
+    
+    # Note:
+    #	Changeover DST not yet fully implemented!
     
     # Examples:
     #   timeDate("2004-01-01") 
@@ -319,32 +327,53 @@ function(charvec, format = NULL, zone = "GMT", FinCenter = myFinCenter)
     if (Sys.timezone() != "GMT") warning("Set timezone to GMT!")
     if (FinCenter == "") FinCenter = "GMT"
         
-    # If charvec is of type "timeDate" extract data slot:
+    # Some extensions - charvec must not be necessarily a character vector!
+    # If charvec is of type "sdate" convert to character:
     if (inherits(charvec, "sdate")) {
         charvec = as.character(charvec)
         format = "%Y%m%d"
-        zone = FinCenter }
-    if (inherits(charvec, "timeDate")) 
+        zone = FinCenter 
+    }
+    # If charvec is of type "timeDate" extract data slot:
+    if (inherits(charvec, "timeDate")) {
         charvec = charvec@Data   
+    }
     # If charvec is of type "POSIXt" convert to character string:
-    if (inherits(charvec, "POSIXt")) 
+    if (inherits(charvec, "POSIXt")) {
         charvec = format(charvec, "%Y-%m-%d %H:%M:%S") 
+	}
     
-    # Dimension
+    # Get Dimension:
     Dim = length(charvec)
         
-    # ISO Format:
+    # ISO Format - Automatic Format Detection:
     iso.format = "%Y-%m-%d %H:%M:%S"
+    nchar.iso = mean(nchar(charvec))
     if (is.character(charvec) & is.null(format)) {
-        nchar.iso = mean(nchar(charvec))
         if (nchar.iso == 10) format = "%Y-%m-%d" 
         if (nchar.iso == 19) format = "%Y-%m-%d %H:%M:%S"
         if (nchar.iso ==  8) format = "%Y%m%d"
         if (nchar.iso == 14) format = "%Y%m%d%H%M%S"
-        if (regexpr("/", charvec[1])[[1]] > 0) format = "%m/%d/%Y" }
-        
+        if (regexpr("/", charvec[1])[[1]] > 0) format = "%m/%d/%Y" 
+    }
+    
+    # ISO-8601 Midnight Standard:
+    s = rep(0, length(charvec))
+    if (nchar.iso == 19) {
+		s[grep("24:00:00", charvec)] = 1
+		charvec = gsub("24:00:00", "23:59:59", charvec) 
+	}
+    if (nchar.iso == 14) {
+    	s[grep("240000", charvec)] = 1
+    	charvec = gsub("240000", "235959", charvec) 
+    }	
+    
     # Convert "charvec" to standard ISO format:
-    charvec = format(strptime(charvec, format), iso.format) 
+    charvec = format(strptime(charvec, format)+s, iso.format)
+    
+    # Financial Centers:
+    recFinCenter = zone # Time zone where the data were recorded
+    useFinCenter = FinCenter # Time zone where the data were used
     
     # Trace Input:
     if (trace) { 
@@ -352,141 +381,172 @@ function(charvec, format = NULL, zone = "GMT", FinCenter = myFinCenter)
         print(recFinCenter)
         print(charvec) 
     }
-    
-    # Financial Centers:
-    recFinCenter = zone # Time zone where the data were recorded
-    useFinCenter = FinCenter # Time zone where the data were used
 
     # Internal Function:
-    formatFinCenter = 
-    function(charvec, FinCenter, type = c("gmt2any", "any2gm")){    
-        # Description:
-        #   Transformation of timeDate character vectors between
-        #   financial centers
-        # Arguments:
-        #   charvec - ISO character vector as "%Y-%m-%d %H:%M:%S"
-        #   format - the character string with format specification
-        #   FinCenter - the Financial center as "Continent/City"
-        #   type - what to convert, either "gmt2any", or "any2gm"
-        # Value:
-        #   returns an ISO character vector as "%Y-%m-%d %H:%M:%S"
-        # FUNCTION:
-        # Convert what?
+    formatFinCenter = function(charvec, FinCenter, 
+    	type = c("gmt2any", "any2gmt")) {
         type = type[1]
         signum = 0
-        if (type == "gmt2any") signum = +1 
-        if (type == "any2gmt") signum = -1      
-        # Convert:
+        if (type == "gmt2any") 
+            signum = +1
+        if (type == "any2gmt") 
+            signum = -1
         if (FinCenter != "GMT") {
-            center = rulesFinCenter(FinCenter)
-            # DW: - duplicate the last entry ... 
-	        z = as.matrix(center)
-			z[dim(z)[1], ]
-			vec1 = as.vector(c(z[, 1], "2099-01-01 00:00:00"))
-			vec2 = as.vector(c(z[, 2], rev(z[, 2])[1]))
-			center = data.frame(
-				ruleChanges = as.character(vec1), 
-				offSet = as.integer(vec2))
-	        # Continue:
-            center1 = as.character(center[, 1])
-            center2 = as.character(center[, 2])      
-            charchanges = center1[!is.na(center1)]              
-            o = order(c(charchanges, charvec))
-            nRC = length(charchanges)
-            nME = length(charvec)
-            center2 = center2[!is.na(center1)] 
-            ishms = c(as.integer(center2), rep(NA, length = nME)) 
-            x = (1:(nRC+nME))[!is.na(ishms[o])]
-            xout = (1:(nRC+nME))[is.na(ishms[o])]
-            y = ishms[o][!is.na(ishms[o])] 
-            offSets = approx(x = x, y = y , xout, method = "constant")$y    
+	        # Get the DST list from the database: 
+            dst.list = rulesFinCenter(FinCenter)
+	        # Update list with last entry: 
+            z = as.matrix(dst.list)
+            z[dim(z)[1], ]
+            vec1 = as.vector(c(z[, 1], "2099-01-01 00:00:00"))
+            vec2 = as.vector(c(z[, 2], rev(z[, 2])[1]))
+            dst.list = data.frame(ruleChanges = as.character(vec1), 
+                offSet = as.integer(vec2))
+            # Extract the dates when DST was changed:
+            dst.dates = as.character(dst.list[, 1])
+            # Extract the Offsets to GMT
+			dst.offsets = as.character(dst.list[, 2])  
+			# The new dates ar the charvec's:
+			new.dates = charvec
+			# The new offsets are still unknown:
+			new.offsets = rep(NA, length(charvec))
+			# Combine all Dates and Offsets:
+			dates = c(dst.dates, new.dates)
+			offsets = c(dst.offsets, new.offsets)
+			# The number of Offsets:
+			n = length(dates)
+			# Order the Dates:
+			o = order(dates)
+			# Dates and Offsets in the right order:
+			o.dates = dates[o]
+			o.offsets = offsets[o]
+			# The points at which we have to determine the offsets
+			xout = (1:n)[is.na(o.offsets)]
+			# The date indexes:
+			x = (1:n)[-xout]
+			# The corresponding offsets
+			y = o.offsets[x]
+			# The new offsets:
+			yout = approx(x, y , xout, method = "constant")$y
+			# All dates:
+			m = length(dst.dates)
+			# Put them in the right order:
+			# Added DW: 2005-05-27
+			idx = order(o[which(o>m)])
+			offSets = yout[idx]      
             dt = strptime(charvec, "%Y-%m-%d %H:%M:%S")             
-            ans = format(dt + signum * offSets, format = "%Y-%m-%d %H:%M:%S") 
-    	} else {
-            ans = charvec }
-        # Return Value:
-        ans }
+            ans = format(dt + signum * offSets, format="%Y-%m-%d %H:%M:%S") 
+        } else {
+            ans = charvec
+        }
+        ans
+    }
     
     # Convert:    
     DEBUG = FALSE
+    
+    # GMT -> GMT:
     if (recFinCenter == "GMT" && useFinCenter == "GMT") {       
         if (DEBUG) print("if - 1:")
         if (trace) { 
             cat("\nOutput: ")
             print(useFinCenter)
-            print(charvec); cat("\n") }
+            print(charvec)
+            cat("\n") 
+        }
         lt = strptime(charvec, iso.format)
         timeTest = sum(lt$hour) + sum(lt$min) + sum(lt$sec) 
         if (timeTest == 0) iso.format = "%Y-%m-%d"
+        # Return Value:
         return(new("timeDate", 
             Data = lt, 
             Dim = as.integer(Dim),
             format = iso.format,
-            FinCenter = useFinCenter)) }  
-             
+            FinCenter = useFinCenter)) 
+    }  
+        
+    # GMT -> nonGMT     
     if (recFinCenter == "GMT" && useFinCenter != "GMT") {
         if (DEBUG) print("if - 2:") 
         charvec = formatFinCenter(charvec, useFinCenter, type = "gmt2any")
         if (trace) { 
             cat("\nOutput: ")
             print(useFinCenter)
-            print(charvec); cat("\n") }
+            print(charvec)
+            cat("\n") 
+        }
         lt = strptime(charvec, iso.format)
         timeTest = sum(lt$hour) + sum(lt$min) + sum(lt$sec) 
         if (timeTest == 0) iso.format = "%Y-%m-%d"
+        # Return Value:
         return(new("timeDate", 
             Data = lt, 
             Dim = as.integer(Dim),
             format = iso.format,
-            FinCenter = useFinCenter)) }    
-                
+            FinCenter = useFinCenter)) 
+    }    
+         
+    # nonGMT -> GMT       
     if (recFinCenter != "GMT" && useFinCenter == "GMT") {
         if (DEBUG) print("if - 3:")
         charvec = formatFinCenter(charvec, recFinCenter, type = "any2gmt")
         if (trace) { 
             cat("\nOutput: ")
             print(useFinCenter)
-            print(charvec); cat("\n") }
+            print(charvec)
+            cat("\n") 
+        }
         lt = strptime(charvec, iso.format)
         timeTest = sum(lt$hour) + sum(lt$min) + sum(lt$sec) 
         if (timeTest == 0) iso.format = "%Y-%m-%d"
+        # Return Value:
         return(new("timeDate", 
             Data = lt, 
             Dim = as.integer(Dim),
             format = iso.format,
-            FinCenter = useFinCenter)) }      
-                
+            FinCenter = useFinCenter)) 
+    }      
+          
+    # nonGMT -> equal nonGMT   
     if (recFinCenter == useFinCenter) {     
         if (DEBUG) print("if - 4:")
         if (trace) { 
             cat("\nOutput: ")
             print(useFinCenter)
-            print(charvec); cat("\n") }
+            print(charvec)
+            cat("\n") 
+        }
         lt = strptime(charvec, iso.format)
         timeTest = sum(lt$hour) + sum(lt$min) + sum(lt$sec) 
         if (timeTest == 0) iso.format = "%Y-%m-%d"
+        # Return Value:
         return(new("timeDate", 
             Data = lt,
             Dim = as.integer(Dim),
             format = iso.format ,
-            FinCenter = useFinCenter)) }    
+            FinCenter = useFinCenter)) 
+    }    
             
+    # nonGMT -> other nonGMT 
     if (recFinCenter != useFinCenter) {
         if (DEBUG) print("if - 5:")
         charvec = formatFinCenter(charvec, recFinCenter, type = "any2gmt")
         charvec = formatFinCenter(charvec, useFinCenter, type = "gmt2any")
         if (trace) { 
             cat("\nOutput: ") 
-            print(useFinCenter); 
-            print(charvec); cat("\n") }
+            print(useFinCenter)
+            print(charvec)
+            cat("\n") 
+        }
         lt = strptime(charvec, iso.format)
         timeTest = sum(lt$hour) + sum(lt$min) + sum(lt$sec) 
         if (timeTest == 0) iso.format = "%Y-%m-%d"
+        # Return Value:
         return(new("timeDate", 
             Data = lt, 
             Dim = as.integer(Dim),
             format = iso.format,
-            FinCenter = useFinCenter)) }    
+            FinCenter = useFinCenter)) 
+    }    
             
     # Return Value:
     invisible()         
@@ -567,8 +627,7 @@ s = NULL, FinCenter = myFinCenter)
     s = rep(s, length = data.len)
     
     # Date-Time Strings:
-    # Note Format is always of type  "%Y%m%d%H%M%S"  !
-    
+    # Note Format is always of type  "%Y%m%d%H%M%S"  !   
     CCYYMMDD = as.integer(y*10000 + m*100 + d)
     chardate = as.character(CCYYMMDD)
     hhmmss = as.integer(1000000 + h*10000 + min*100 + s)
@@ -586,7 +645,7 @@ s = NULL, FinCenter = myFinCenter)
 
 timeSequence = 
 function(from = "2004-01-01", to = format(Sys.time(), "%Y-%m-%d"), 
-by = "day", length.out = NULL, format = "", FinCenter = myFinCenter)
+by = "day", length.out = NULL, format = NULL, FinCenter = myFinCenter)
 {   # A function implemented by Diethelm Wuertz
 
     # Description:
@@ -659,11 +718,12 @@ by = "day", length.out = NULL, format = "", FinCenter = myFinCenter)
         # The start "from" and end date "to" must be specified!
         to = strptime(as.character(to), format = format)
         charvec = format(seq.POSIXt(from = from, 
-            to = to, by = by), iso.format) }
-    else  {
+            to = to, by = by), iso.format) 
+    } else  {
         # The end date is missing and has to be specified
         charvec = format(seq.POSIXt(from = from, 
-            by = by, length.out = length.out), iso.format) }
+            by = by, length.out = length.out), iso.format) 
+    }
             
     # Create timeDate Object:  
     ans = timeDate(charvec = charvec, format = NULL, 
@@ -785,7 +845,7 @@ function(charvec, nday = 1, format = "%Y-%m-%d", FinCenter = "GMT")
     
     # Example: 
     #   What date has the first Monday on or after March 15, 1986?
-    #   OnOrAfter("1986-03-15", 1)
+    #   timeNdayOnOrAfter("1986-03-15", 1)
     
     # FUNCTION:
     
@@ -1041,8 +1101,8 @@ function(object, ...)
     # Print:
     x = object
     cat("\nObject:       ", as.character(match.call())[2])
-    cat("\nFirstRecord:  ", as.character(start(x)))
-    cat("\nEndRecord:    ", as.character(end(x)))
+    cat("\nStart Record: ", as.character(start(x)))
+    cat("\nEnd Record:   ", as.character(end(x)))
     cat("\nObservations: ", length(as.character(x)))
     cat("\nFormat:       ", x@format)
     cat("\nFinCenter:    ", x@FinCenter)
@@ -1082,6 +1142,121 @@ function(x, ...)
     # Return Value:
     ans
 }
+
+
+################################################################################
+
+
+isWeekday = 
+function(x) 
+{  	# A function implemented by Diethelm Wuertz
+
+	# Description:
+	#	Test if a date is a weekday day or not
+	
+	# Arguments:
+	#	x - an object of class "timeDate"
+	
+	# Value:
+	#	returns a logical or a vector of logicals
+	
+	# Example:
+	#	isWeekday(timeDate("2004-07-01"))
+	#   isWeekday(Sys.timeDate())
+	
+	# FUNCTION:
+	
+	# Return Value:
+	wday = (x@Data)$wday
+	return(!(wday == 0 | wday == 6)) 
+}
+
+
+# ------------------------------------------------------------------------------
+
+    
+isWeekend = 
+function(x) 
+{	# A function implemented by Diethelm Wuertz
+
+	# Description:
+	#	Tests if a date is a weekend day or not
+	
+	# Arguments:
+	#	x - an object of class "timeDate"
+	
+	# Value:
+	#	returns a logical or a vector of logicals
+	
+	# Example:
+	#	isWeekend(timeDate("2004-07-01"))
+	#	isWeekend(Sys.timeDate())
+	
+	# FUNCTION:
+	
+	# Return Value:
+	return(!isWeekday(x)) 
+}   
+
+
+# ------------------------------------------------------------------------------
+
+    
+isBizday = 
+function(x, holidays = holiday.NYSE()) 
+{ 	# A function implemented by Diethelm Wuertz
+
+	# Description:
+	#	Test if a date is a business day or not
+	
+	# Arguments:
+	#	x - an object of class "timeDate"
+	#   holidays - a holiday calendar
+	
+	# Value:
+	#	returns a logical or a vector of logicals
+	
+	# Example:
+	#	x = timeSequence(from = "2005-05-15", to = "2005-07-15")
+	#   h = holiday.NYSE(2005)
+	#   cbind(as.character(x), is.bizday(x, h))
+	
+	# FUNCTION:
+	
+	# Test:
+	char.x = substr(as.character(x), 1, 10)
+	char.h = substr(as.character(holidays), 1, 10)
+	Weekday = as.integer(isWeekday(x))
+	nonHoliday = as.integer(!(char.x %in% char.h))
+	
+	# Business Days:
+	bizdays = as.logical(Weekday*nonHoliday)
+    
+    # Return Value:
+    bizdays
+} 
+
+
+# ------------------------------------------------------------------------------
+
+
+weekDay =
+function(x)
+{	# A function implemented by Diethelm Wuertz
+
+	# Description:
+	#	Returns day of week for time date objects
+	
+	# Example:
+	#	weekDay(Sys.timeDate())
+	#	weekDay(timeSequence("2005-05-15", "2005-07-15"))
+	
+	wdays = c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+	n = as.POSIXlt(x@Data)$wday + 1
+	
+	# Retudn Value:
+	wdays[n]
+}    	
 
 
 ################################################################################

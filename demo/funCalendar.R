@@ -1,12 +1,13 @@
 
 #
-# fBasics Functions Addon:
+# fCalendar Functions Addon:
 #
 #   1 Chron Package Addon
-#   2 Additional Time/Date Functions
+#   2 Zurich Holiday Calendar
+#	3 Time Series Summary
 #
 # Author:
-#	Diethelm Wuertz, GPL
+#	(C) 2004, Diethelm Wuertz, GPL
 #
 
 
@@ -141,83 +142,8 @@ function(from, to, by = "days", length.out = NULL, k.by = 1, ...)
 
 
 ################################################################################
-# 2 Additional Time/Date Functions
+# 2 Zurich Holiday Calendar
       
-    
-is.weekday = 
-function(x) 
-{  	# A function implemented by Diethelm Wuertz
-
-	# Description:
-	#	Test if a date is a weekday day or not
-	
-	# Arguments:
-	#	x - an object of class "timeDate"
-	
-	# Value:
-	#	returns a logical or a vector of logicals
-	
-	# FUNCTION:
-	
-	# Return Value:
-	wday = (x@Data)$wday
-	return(!(wday == 0 | wday == 6)) 
-}
-
-
-# ------------------------------------------------------------------------------
-
-    
-is.weekend = 
-function(x) 
-{	# A function implemented by Diethelm Wuertz
-
-	# Description:
-	#	Test if a date is a weekend day or not
-	
-	# Arguments:
-	#	x - an object of class "timeDate"
-	
-	# Value:
-	#	returns a logical or a vector of logicals
-	
-	# FUNCTION:
-	
-	# Return Value:
-	return(!is.weekday(x)) 
-}   
-
-
-# ------------------------------------------------------------------------------
-
-    
-is.bizday = 
-function(x, holidays) 
-{ 	# A function implemented by Diethelm Wuertz
-
-	# Description:
-	#	Test if a date is a business day or not
-	
-	# Arguments:
-	#	x - an object of class "timeDate"
-	#   holidays - a holiday calendar
-	
-	# Value:
-	#	returns a logical or a vector of logicals
-	
-	# FUNCTION:
-	
-	# Test:
-    if (x@FinCenter != holidays@FinCenter) stop("Different FinCenters")
-    x = is.weekday(modify(x, "trunc", "days"))
-    
-    # Return Value:
-    return(x[!(as.character(x) %in% as.character(holidays))]) 
-}     	
-
-
-# ------------------------------------------------------------------------------
-
     
 holiday.ZURICH = 
 function(y = currentYear) 
@@ -278,7 +204,8 @@ function(y = currentYear)
 }
 
 
-# ------------------------------------------------------------------------------
+################################################################################
+# 3 'timeSeries' Summary
 
     
 summary.timeSeries = 

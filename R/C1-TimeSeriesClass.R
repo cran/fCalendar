@@ -100,6 +100,7 @@ setClass("timeSeries",
         format = "character",
         FinCenter = "character",      
         units = "character",
+        recordIDs = "data.frame",
         title = "character",
         documentation = "character")    
 )
@@ -110,7 +111,8 @@ setClass("timeSeries",
 
 timeSeries =
 function (data, charvec, units = NULL, format = "ISO", zone = "GMT", 
-FinCenter = myFinCenter, title = NULL, documentation = NULL, ...) 
+FinCenter = myFinCenter, recordIDs = data.frame(), title = NULL, 
+documentation = NULL, ...) 
 {   # A function implemented by Diethelm Wuertz
 
     # Description:
@@ -127,6 +129,7 @@ FinCenter = myFinCenter, title = NULL, documentation = NULL, ...)
     #       recorded.
     #   FinCenter - a character with the the location of the  
     #       financial center named as "continent/city". 
+    #   recordIDS - stores record IDs in form of a data frame
     #   title - an optional title string, if not specified the inputs 
     #       data name is deparsed.
     #   documentation - optional documentation string.
@@ -186,6 +189,7 @@ FinCenter = myFinCenter, title = NULL, documentation = NULL, ...)
         format = timeDates@format,
         FinCenter = timeDates@FinCenter,  
         units = as.character(units), 
+        recordIDs = as.data.frame(recordIDs),
         title = as.character(title), 
         documentation = as.character(documentation) )            
 }
@@ -239,7 +243,8 @@ documentation = "", sep = ";")
     
     # Create Time Series:
     ans = timeSeries(data, charvec, units, format, zone = "GMT", 
-        FinCenter, title = "", documentation = file) 
+        FinCenter, recordIDS = data.frame(), title = "", 
+        documentation = file) 
         
     # For dates only, cut format string:
     if (nchar(ans@positions[1]) == 10) 
@@ -293,9 +298,6 @@ function(x, dimnames = TRUE, format = "")
     rownames(data) = rowNames 
         
     # Return Value:
-    # new("timeSeries", Data = data, positions = as.character(rowNames), 
-    #     format = format, FinCenter = "GMT", units = colNames, 
-    #     title = as.character(""), documentation = as.character(""))
     timeSeries(data = data, charvec = as.character(rowNames), 
         units = colNames, format = format, zone = myFinCenter)
 }
@@ -652,7 +654,7 @@ function(x, lag = 1, diff = 1, trim = FALSE, pad = NA)
 
 
 lagSeries = 
-function(x, k = 1, trim = FALSE, colNames = NULL)
+function(x, k = 1, trim = FALSE, units = NULL)
 {   # A function implemented by Diethelm Wuertz
     
     # Description:
@@ -669,6 +671,9 @@ function(x, k = 1, trim = FALSE, colNames = NULL)
     #   Returns a lagged object of class 'timeSeries'.
  
     # FUNCTION:
+    
+    # Column Names:
+    colNames = units
     
     # Internal Function:
     tslagMat = function(x, k = 1) {
@@ -1003,7 +1008,7 @@ function(x, row.names = NULL, optional = NULL)
 
 
 applySeries =
-function(x, from = NULL, to = NULL, FUN = colAvgs, colNames = NULL, ...)
+function(x, from = NULL, to = NULL, FUN = colAvgs, units = NULL, ...)
 {   # A function implemented by Diethelm Wuertz
     
     # Description:
@@ -1038,6 +1043,9 @@ function(x, from = NULL, to = NULL, FUN = colAvgs, colNames = NULL, ...)
     #   is kept in the 'from' and 'to' position vectors.
   
     # FUNCTION:
+    
+    # Column Names:
+    colNames = units
     
     # Check object:
     if (class(x) != "timeSeries") stop("s is not a timeSeries object")
@@ -1110,6 +1118,7 @@ function(x, from, to)
     x@Data = Data
     x@positions = x@positions[test]
     x@units = Units
+    x@recordIDs = data.frame()
     colnames(x@Data) = colNames
     
     # Return Value:
@@ -1161,6 +1170,7 @@ function(x, y, units = NULL)
         format = as.character(x@format), 
         FinCenter = as.character(x@FinCenter),
         units = colnames(x@Data), 
+        recordIDs = data.frame(),
         title = as.character(x@title), 
         documentation = as.character(x@documentation) )          
 }
@@ -1171,7 +1181,7 @@ function(x, y, units = NULL)
 
 returnSeries =
 function(x, type = c("continuous", "discrete"), percentage = FALSE, 
-trim = TRUE, digits = 4)
+trim = TRUE, digits = 4, units = NULL)
 {   # A function implemented by Diethelm Wuertz
 
     # Description:
@@ -1230,6 +1240,7 @@ trim = TRUE, digits = 4)
             format = as.character(x@format), 
             FinCenter = as.character(x@FinCenter), 
             units = as.character(x@units), 
+            recordIDs = data.frame(),
             title = as.character(x@title), 
             documentation = as.character(x@documentation) ) }
     else {  
@@ -1242,6 +1253,12 @@ trim = TRUE, digits = 4)
     if (percentage) digits = digits - 2
     ans@Data = round(ans@Data, digits = digits)
     
+    # Add New Units:
+    if (!is.null(units)){
+	    ans@units = units
+	    colnames(ans@Data) = units
+	}
+    
     # Return Value:
     ans
 }
@@ -1252,7 +1269,7 @@ trim = TRUE, digits = 4)
 
 alignDailySeries = 
 function (x, method = c("before", "after", "interp", "fillNA"), 
-include.weekends = FALSE) 
+include.weekends = FALSE, units = NULL) 
 {   # A function implemented by Diethelm Wuertz
     
     # Description:
@@ -1358,7 +1375,13 @@ include.weekends = FALSE)
         for ( i in 2:DimX ) {
             ans.add = alignDailySeries.OneColumn(x = x[, i], 
                 method = method, include.weekends = include.weekends)
-            ans = mergeSeries(ans, ans.add@Data) }          }
+            ans = mergeSeries(ans, ans.add@Data) }  
+            
+     # Add New Units:
+    if (!is.null(units)){
+	    ans@units = units
+	    colnames(ans@Data) = units
+	}        }
     
     # Return Value:
     ans

@@ -23,6 +23,11 @@
 \alias{summary.timeDate}
 \alias{format.timeDate}
 
+\alias{isWeekday}
+\alias{isWeekend}
+\alias{isBizday}
+\alias{weekDay}
+
 
 \title{timeDate Class}
 
@@ -80,6 +85,14 @@
     \code{print.timeDate} \tab S3: Prints 'timeDate', 'FinCenter' and 'Data' Slot, \cr
     \code{summary.timeDate} \tab S3: Summarizes details of a 'timeDate' object, \cr
     \code{format.timeDate} \tab Formats 'timeDate' as ISO conform character string. }
+    
+    Additional Functions:
+    
+    \tabular{ll}{ 
+    \code{isWeekday} \tab Tests if a date is a weekday or not, \cr
+    \code{isWeekend} \tab Tests if a date falls on a weekend or not, \cr
+    \code{isBizday} \tab Tests if a date is a business day or not, \cr
+    \code{weekDay} \tab Returns the day of the week.}
         
 }
 
@@ -110,6 +123,11 @@ is.timeDate(object)
 \method{print}{timeDate}(x, \dots)
 \method{summary}{timeDate}(object, \dots)
 \method{format}{timeDate}(x, \dots)
+
+isWeekday(x)
+isWeekend(x)
+isBizday(x, holidays = holiday.NYSE())
+weekDay(x)
 }
 
 
@@ -140,6 +158,11 @@ is.timeDate(object)
         minutes of the days (0-59), defaults are 0, and 
         seconds of the days (0-59), defaults are 0. 
         }
+    \item{holidays}{
+    	[isBizday] - \cr
+    	holiday dates from a holiday calendar. An object of class
+    	\code{timeDate}.
+    	}
     \item{length.out}{
         length.out integer, optional. Desired length  
         of the sequence, if specified "to" will be ignored.
@@ -160,6 +183,9 @@ is.timeDate(object)
         by the \code{grep} function. Wild cards are allowed.
         }
     \item{x}{
+    	[isWeekday][isWeekend][isBizday][weekDay] - \cr
+    	an object of class \code{timeDate}.
+		\cr
         [format][print] - \cr
         an object of class \code{timeDate}.
         }
@@ -221,6 +247,17 @@ is.timeDate(object)
     returns \code{TRUE} or \code{FALSE} depending on whether its
     argument is of \code{timeDate} type or not.
     \cr
+    
+   	\code{isWeekday}\cr
+   	\code{isWeekend}\cr
+   	\code{isBizday}\cr
+   	\code{weekDay}
+   	\cr
+   	The first thres functions return logical vectors indicating
+   	if a date is a weekday, a weekend day, or a business.day. The
+   	function \code{weekDay} returns a three letter character string
+   	with the names of the day of the week.
+   	\cr
     
     \emph{Print Method:}
     \cr
@@ -358,8 +395,8 @@ is.timeDate(object)
 \note{
 
     These functions were written for Rmetrics users using R and Rmetrics
-    under Microsoft's Windows XP operating system where timze zones, 
-    daylight saving times and holiday calendars are insuffeciently 
+    under Microsoft's Windows XP operating system where time zones, 
+    daylight saving times and holiday calendars are not or insuffeciently 
     supported. The functions are untested for other system environments, 
     but may be used.
     
@@ -370,6 +407,17 @@ is.timeDate(object)
     for R Version 1.9.1. As a consequence, newer concepts like the 
     \code{Date} objects were not yet considered and included in this 
     collection of date and time concepts.
+    
+    Note, the date/time conversion from an arbitry timezone to GMT cannot
+    be unique, since date/time objects appear twice during the hour
+    when DST changes. A bookkeeping which takes care if DST is effective 
+    or not is not yet included. However, in most applications this is 
+    not important since the markets are closed on weekends, especially 
+    at times when DST usually changes. It is planned for the future to
+    implement the DST change properly.
+    
+    The ISO-8601 midnight standard has been implemented. Note, that for
+    example "2005-01-01 24:00:00" is a valid date/time string.
     
     IT IS IMPORTANT THAT YOU SET YOUR ENVIRONMENT VARIABLE TZ TO 'GMT',
     OTHERWISE SOME OF THE 'TIMEDATE' FUNCTIONS WOULD NOT PROPERLY WORK! 

@@ -57,8 +57,9 @@
    ZURICH = timeDate(paste(dts, tms), format = "%Y-%m-%d %H:%M:%S", 
      zone = "GMT", FinCenter = "Europe/Zurich") 
    ZURICH
-   # [1] "1989-09-28 23:12:55 GMT" "2001-09-15 10:34:02 GMT"
-   # [3] "2004-08-30 08:30:00 GMT" "1990-02-09 11:18:23 GMT"
+   # [1] "Europe/Zurich"
+   # [1] [1989-09-29 00:12:55] [2001-01-15 11:34:02]
+   # [3] [2004-08-30 10:30:00] [1990-02-09 12:18:23]
    ###
    
    
@@ -72,21 +73,23 @@
    unclass(ZURICH)  
    # list()
    # attr(,"Data")
-   # [1] "1989-09-28 23:12:55 GMT" "2001-01-15 10:34:02 GMT"
-   # [3] "2004-08-30 08:30:00 GMT" "1990-02-09 11:18:23 GMT"
+   # [1] "1989-09-29 00:12:55" "2001-01-15 11:34:02"
+   # [3] "2004-08-30 10:30:00" "1990-02-09 12:18:23"
+   # attr(,"Dim")
+   # [1] 4
    # attr(,"format")
    # [1] "%Y-%m-%d %H:%M:%S"
-   # attr(,"time.zone")
-   # [1] "GMT"
+   # attr(,"FinCenter")
+   # [1] "Europe/Zurich"
    ###
   
     
 ## timeDate - Display the Internal Representation for the @Data Slot:
    
    # What class?
-   class(ZURICH@Data)
+   class(GMT@Data)
    # [1] "POSIXt"  "POSIXlt"
-   unclass(ZURICH@Data)  
+   unclass(GMT@Data)  
    # $sec
    # [1] 55  2  0 23
    # $min
@@ -135,7 +138,7 @@
      y = c(1989, 2001, 2004, 1990), FinCenter = "Europe/Zurich")
    CCYYMMDD
    # [1] "Europe/Zurich"
-   # [1] [1989-09-28 01:00:00] [2001-01-15 01:00:00] [2004-08-30 01:00:00] ...
+   # [1] [1989-09-28] [2001-01-15] [2004-08-30] ...
    # Class:
    class(CCYYMMDD)
    # [1] "timeDate"
@@ -149,8 +152,14 @@
      h = c(9, 14), 
      min = c(15, 23)) 
    CCYYMMDDhhmmss
-   # [1] "Europe/Zurich"
-   # [1] [1960-01-01 09:15:00] [1960-01-01 14:23:00]
+   # [1] "Zurich"
+   #  [1] [2005-01-01 09:15:00] [2005-02-01 14:23:00]
+   #  [3] [2005-03-01 09:15:00] [2005-04-01 14:23:00]
+   #  [5] [2005-05-01 09:15:00] [2005-06-01 14:23:00]
+   #  [7] [2005-07-01 09:15:00] [2005-08-01 14:23:00]
+   #  [9] [2005-09-01 09:15:00] [2005-10-01 14:23:00]
+   # [11] [2005-11-01 09:15:00] [2005-12-01 14:23:00]
+
    class(CCYYMMDDhhmmss) 
    # [1] "timeDate"
    # attr(,"package")
@@ -185,8 +194,7 @@
         format = "%Y-%m-%d %H:%M:%S", FinCenter = "GMT")
    timeSequence(
         from = "2004-03-12 16:00:00", to = "2004-04-11 16:00:00", 
-        format = "%Y-%m-%d %H:%M:%S", FinCenter = "Europe/Zurich")
-        
+        format = "%Y-%m-%d %H:%M:%S", FinCenter = "Europe/Zurich")    
    timeSequence(
         from = "2003-03-12 16:00:00", to = "2004-02-12 16:00:00", 
         by = "month", format = "%Y-%m-%d %H:%M:%S", FinCenter = "GMT")
@@ -216,6 +224,8 @@
    charvec = format(ZURICH)  
    charvec
    # [1] "1989-09-29 00:12:55" "2001-01-15 11:34:02" ...
+   class(charvec)
+   # [1] "character"
    ###
    
    
@@ -248,6 +258,7 @@
    # Add One Day:
    ZURICH
    ZURICH + 24*3600
+   # Subtract one Day:
    ZURICH - 24*3600
    ####
    
@@ -389,7 +400,7 @@
    # Days:
    atoms(ZURICH)[,3]
    # Columnames are: "Y", "m", "d", "H", "M", "S"
-   atoms(ZURICH)[,"d"]
+   atoms(ZURICH)[, "d"]
    ###
    
    

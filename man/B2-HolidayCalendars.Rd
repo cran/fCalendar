@@ -97,7 +97,7 @@ sleap.year(sdates)
 \method{print}{sdate}(x, \dots)
 
 fjulian(fdates, origin = 19600101, order = 'mdy', cc = NULL, swap = 20)
-.julian(m, d, y, origin = c(month = 1, day = 1, year = 1960)
+.julian(m, d, y, origin = c(month = 1, day = 1, year = 1960))
 
 month.day.year(jul, origin = c(month = 1, day = 1, year = 1960))
 leap.year(y) 

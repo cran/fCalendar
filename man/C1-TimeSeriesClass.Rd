@@ -106,7 +106,8 @@
 
 \usage{
 timeSeries(data, charvec, units = NULL, format = "ISO", zone = "GMT", 
-    FinCenter = myFinCenter, title = NULL, documentation = NULL, ...) 
+    FinCenter = myFinCenter, recordIDs = data.frame(), title = NULL, 
+    documentation = NULL, ...) 
 read.timeSeries(file, zone = "GMT", FinCenter = "", title = "", 
     documentation = "", sep = ";")
     
@@ -129,17 +130,17 @@ seriesPositions(object)
 \method{as.matrix}{timeSeries}(x)
 \method{as.data.frame}{timeSeries}(x, row.names = NULL, optional = NULL)
 
-applySeries(x, from = NULL, to = NULL, FUN = colAvgs, colNames = NULL, ...) 
+applySeries(x, from = NULL, to = NULL, FUN = colAvgs, units = NULL, ...) 
 cutSeries(x, from, to)
 diffSeries(x, lag = 1, diff = 1, trim = FALSE, pad = NA)
-lagSeries(x, k = 1, trim = FALSE, colNames = NULL)
+lagSeries(x, k = 1, trim = FALSE, units = NULL)
 mergeSeries(x, y, units = NULL)
 returnSeries(x, type = c("continuous", "discrete"), percentage = FALSE, 
-    trim = TRUE, digits = 4)
+    trim = TRUE, digits = 4, units = NULL)
 revSeries(x)
     
 alignDailySeries(x, method = c("before", "after", "interp", "fillNA"), 
-    include.weekends = FALSE)
+    include.weekends = FALSE, units = NULL)
 ohlcDailyPlot(x, volume = TRUE, colOrder = c(1:5), units = 1e6, 
     xlab = c("Date", "Date"), ylab = c("Price", "Volume"), 
     main = c("O-H-L-C", "Volume"), grid.nx = 7, grid.lty = "solid", \dots) 
@@ -151,13 +152,6 @@ ohlcDailyPlot(x, volume = TRUE, colOrder = c(1:5), units = 1e6,
     \item{charvec}{
         a character vector of dates and times.
         }
-    \item{colNames}{
-        [applySeries][lag] - \cr
-        a character string, which allows to overwrite the current
-        column names of a \code{timeSeries} object. By default 
-        \code{NULL} which means that the column names are selected
-        automatically.
-        }   
     \item{colOrder}{
         [ohlcDailyPlot] - \cr 
         an integer vector which gives the order of the prices and the
@@ -273,6 +267,9 @@ ohlcDailyPlot(x, volume = TRUE, colOrder = c(1:5), units = 1e6,
         a logical value. By default \code{FALSE}, if \code{TRUE} the 
         series will be expressed in percentage changes.
         }
+    \item{recordIDs}{
+        a data frame which can be used for record identification.
+        }
     \item{reference.grid}{
         [plot] - \cr    
         a logical value. Should a grid be added to the plot? By
@@ -300,12 +297,12 @@ ohlcDailyPlot(x, volume = TRUE, colOrder = c(1:5), units = 1e6,
         the logarithmic differences, otherwise if \code{type="discrete"}, 
         the returns are calculated as percentage changes. 
         }
-    \item{units}{   
-        an optional units string, \code{NULL} defaults an empty string.
-        \cr
-        [mergeSeries] - \cr
-        an integer string or vector which allows to rename the units 
-        in the units Slot of the \code{timeSeries} object.
+    \item{units}{
+        [applySeries][lag][allignDailySeries][returnSeries][mergeSeries] - \cr
+        an optional character string, which allows to overwrite the 
+        current column names of a \code{timeSeries} object. By default 
+        \code{NULL} which means that the column names are selected
+        automatically.
         \cr
         [ohlcDailyPlot] - \cr
         a numeric value, specifying in which multiples the volume should
@@ -411,12 +408,12 @@ ohlcDailyPlot(x, volume = TRUE, colOrder = c(1:5), units = 1e6,
     
     We have defined a \code{timeSeries} class which is in many aspects similar
     to the S-Plus class with the same name, but has also some important
-    differeneces. The class has seven Slots, the 'Data' slot which holds 
+    differences. The class has seven Slots, the 'Data' slot which holds 
     the time series data in matrix form, the 'position' slot which holds
     the time/date as a character vector, the 'format' and 'FinCenter'
     slots which are the same as for the 'timeDate' object, the 'units'
     slot which holds the column names of the data matrix, and a 'title'
-    and a documentation' slot which hold descriptive character strings.
+    and a 'documentation' slot which hold descriptive character strings.
     Date and time is managed in the same way as for \code{timeDate} objects.
 
 }

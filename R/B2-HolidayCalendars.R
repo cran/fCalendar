@@ -43,14 +43,14 @@
 #  sdate               Computes ISO-8601 dates from Julian day numbers
 #  sday.of.week        Computes day of the week for ISO-8601 dates 
 #  sleap.year          Returns TRUE/FALSE if dates belong to leap years or not
-#  print.sdate         Prints method for objects of class "sdate"
+#  print.sdate         Print method for objects of class "sdate"
 # FUNCTION:           DESCRIPTION:
 #  fjulian             Transform formatted dates to julian day numbers
 # FUNCTION:           DESCRIPTION:
-#  .julian             Implements Splus like julian
-#  month.day.year      Implements Splus like month.day.year
-#  leap.year           Implements Splus like leap.year
-#  day.of.week         Implements Splus like day.of.week
+#  .julian             Implements SPlus like 'julian'
+#  month.day.year      Implements SPlus like 'month.day.year'
+#  leap.year           Implements SPlus like 'leap.year'
+#  day.of.week         Implements SPlus like 'day.of.week'
 ################################################################################
 
 

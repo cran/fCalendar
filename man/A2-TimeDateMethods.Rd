@@ -97,7 +97,7 @@ difftimeDate(time1, time2,
 \method{rep}{timeDate}(x, times, \dots)
 \method{start}{timeDate}(x, \dots)
 \method{end}{timeDate}(x, \dots)
-\method{modify}{timeDate}(x, method = c("sort", "round", "trunc", 
+\method{modify}{timeDate}(x, method = c("sort", "round", "trunc"),
 	units = c("secs", "mins", "hours", "days"))
 \method{rev}{timeDate}(x)
 
@@ -133,6 +133,11 @@ difftimeDate(time1, time2,
     \item{lag}{
     	[lag] - \cr
     	an integer indicating which lag to use.  
+		}
+	\item{method}{
+    	[modify] - \cr
+    	a character string defining the modification method, one of
+    	\code{"sort"}, \code{"round"}, or \code{"trunc"}. 
 		}
 	\item{recursive}{
 		[c] - \cr
