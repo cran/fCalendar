@@ -1,5 +1,5 @@
 Package: fCalendar
-Version: 270.78
+Version: 270.78.1
 Date: 1997 - 2008
 Title: Chronological and Calendarical Objects
 Author: Diethelm Wuertz, Yohan Chalabi
@@ -13,4 +13,4 @@ LazyLoad: yes
 LazyData: yes
 License: GPL (>= 2)
 URL: http://www.rmetrics.org
-Packaged: Sat Oct 25 23:12:32 2008; yankee
+Packaged: Mon Oct 27 15:25:04 2008; yankee
