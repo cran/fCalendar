@@ -1,10 +1,10 @@
 
-# Rmetrics is free software; you can redistribute it and/or
+# This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
 # License as published by the Free Software Foundation; either
 # version 2 of the License, or (at your option) any later version.
 #
-# It is distributed in the hope that it will be useful,
+# This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU Library General Public License for more details.
@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port:
-#   1999 - 2007, Diethelm Wuertz, GPL
+#   1999 - 2008, Diethelm Wuertz, Rmetrics Foundation, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -28,18 +28,45 @@
 
 
 ################################################################################
+# FUNCTION:                 SETTINGS:
+#  currentYear               Sets date of the current year
+#  .currentYear              Returns the the current year
+#  myUnits                   Sets date units
+################################################################################
 
 
-test.zurich =
-function()
-{
-    # DST Rules for Zurich:
-    head(Zurich())
-    tail(Zurich())
+.currentYear <- 
+    function()
+{   
+    # A function implemented by Diethelm Wuertz
 
-    # Return Value:
-    return()
+    # Description:
+    #   Sets date of the current year
+    
+    # FUNCTION:
+    
+    # Check Time Zone:
+    TZ <- Sys.getenv("TZ")
+    if(TZ[[1]] != "GMT") {
+        Sys.setenv(TZ = "GMT")
+        on.exit(Sys.setenv(TZ = TZ))
+    }
+
+    # Return current year:
+    as.POSIXlt(Sys.time())$year + 1900
 }
+
+
+# ------------------------------------------------------------------------------
+
+
+currentYear <- .currentYear()
+
+
+# ------------------------------------------------------------------------------
+
+
+myUnits <- "days"
 
 
 ################################################################################

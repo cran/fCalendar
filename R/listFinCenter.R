@@ -1,0 +1,645 @@
+
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General
+# Public License along with this library; if not, write to the
+# Free Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA  02111-1307  USA
+
+# Copyrights (C)
+# for this R-port:
+#   1999 - 2008, Diethelm Wuertz, Rmetrics Foundation, GPL
+#   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
+#   info@rmetrics.org
+#   www.rmetrics.org
+# for the code accessed (or partly included) from other R-ports:
+#   see R's copyright and license files
+# for the code accessed (or partly included) from contributed R-ports
+# and other sources
+#   see Rmetrics's copyright file
+
+
+################################################################################
+# FUNCTION:                 FINANCIAL CENTERS:
+#  myFinCenter               Sets my financial center
+#  rulesFinCenter            Returns DST rules for a financial center
+#  listFinCenter             Lists all supported financial centers
+# VARABLE:                  LIST OF FINANCIAL CENTERS:
+#  .FinCenterList            The list with FinCenter names
+################################################################################
+
+
+################################################################################
+# FUNCTION:                 FINANCIAL CENTERS:
+#  myFinCenter               Sets my financial center
+#  rulesFinCenter            Returns DST rules for a financial center
+#  listFinCenter             Lists all supported financial centers
+
+
+myFinCenter = "GMT"
+
+
+# ------------------------------------------------------------------------------
+
+
+rulesFinCenter <-
+function(FinCenter = myFinCenter)
+{   # A function implemented by Diethelm Wuertz
+
+    # Description:
+    #   Show the day light saving rules for a financial center
+
+    # Arguments:
+    #   FinCenter - a character string with the the location of the
+    #       financial center named as "continent/city".
+
+    # FUNCTION:
+
+    # Check:
+    if (FinCenter == "GMT" | FinCenter == "")
+        stop("There are no DST rules for GMT FinCenter!")
+
+    # Set Timezone to GMT:
+    myTZ = Sys.getenv("TZ")
+    Sys.setenv(TZ = "GMT")
+    if (FinCenter == "") FinCenter = "GMT"
+
+    TZ <- Sys.getenv("TZ")
+    if(TZ[[1]] != "GMT") {
+        Sys.setenv(TZ = "GMT")
+        on.exit(Sys.setenv(TZ = TZ))
+    }
+
+    # Internal Function for Conversion from Ical Tables:
+    #    if (FALSE) {
+    #    rulesFinCenter2 =
+    #    function(FinCenter = myFinCenter) {
+    #        # A function implemented by Diethelm Wuertz
+    #        # Description:
+    #        #   Show the day light saving rules for a financial center
+    #        # Arguments:
+    #        #   FinCenter - a character string with the the location of the
+    #        #       financial center named as "continent/city".
+    #        # Value:
+    #        #   Returns a printed list of DST rules.
+    #        # Example:
+    #        #   > rulesFinCenter("Zurich")
+    #        #               ruleChanges offSet
+    #        #   1   1894-05-31 23:30:16   3600
+    #        #   2   1940-11-01 23:00:00   7200
+    #        #   3   1940-12-30 22:00:00   3600
+    #        #   5   1941-10-04 22:00:00   3600
+    #        #   6   1942-05-03 01:00:00   7200
+    #        #   7   1942-10-03 22:00:00   3600
+    #        #   8   1980-12-31 23:00:00   3600
+    #        #   9   1981-03-29 01:00:00   7200
+    #        #   ...
+    #        # Note:
+    #        #   Important, the "TZ" environment variable must set
+    #        #   to "GMT" in your Windows Environment!
+    #
+    #        # Set Timezone to GMT:
+    #        myTZ = Sys.getenv("TZ")
+    #        Sys.setenv(TZ = "GMT")
+    #        if (FinCenter == "") FinCenter = "GMT"
+    #
+    #        # Read the Rules:
+    #        # Get IcalPath from .FirstLib
+    #        file = paste(IcalPath, FinCenter, sep = "")
+    #        zfile <- zip.file.extract(file, "Rdata.zip")
+    #        ical = read.table(zfile, skip = 2)
+    #
+    #        # GMT Offsets:
+    #        hm = as.integer(ical[,6])
+    #        sg = sign(hm)
+    #        hm = abs(hm)
+    #        h = floor(hm/100)
+    #        hms.off = sg * ( floor(hm/100)*3600 + (hm - 100*h)*60 + 0 )
+    #        hms.off
+    #
+    #        # When have the rules changed?
+    #        months.num = 1:12
+    #        names(months.num) = c(
+    #            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    #            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+    #        Y = as.integer(ical[,4])
+    #        m = as.integer(months.num[as.character(ical[,3])])
+    #        d = as.integer(ical[,2])
+    #        CCYYMMDD = as.character(Y*10000+100*m+d)
+    #        hms = unlist(strsplit(as.character(ical[,5]), ":"))
+    #        hms = matrix(as.integer(hms), byrow=TRUE, ncol=3)
+    #        hms = 1000000 + 10000*hms[,1] + 100*hms[,2] + hms[,3]
+    #        hhmmss = substr(as.character(hms), 2, 7)
+    #        ruleChangesGMT = strptime(paste(CCYYMMDD, hhmmss), "%Y%m%d %H%M%S")
+    #        attr(ruleChangesGMT, "tzone") <- "GMT"
+    #
+    #        # Return Value:
+    #        Sys.setenv(TZ = myTZ)
+    #        data.frame(ruleChanges = as.character(ruleChangesGMT),
+    #            offSet = hms.off) }
+    #    }
+    #    ## Instead:
+
+    # Match City:
+    fccity <- strsplit(FinCenter, "/")[[1]]
+    City <- fccity[length(fccity)]
+    fun <- match.fun(City)
+
+    # Return Value:
+    fun()
+}
+
+
+# ------------------------------------------------------------------------------
+
+
+listFinCenter <-
+function(pattern = ".*")
+{   # A function implemented by Diethelm Wuertz
+
+    # Description:
+    #   Lists available Financial Centers
+
+    # Arguments:
+    #   pattern - a pattern character string which can be recognized
+    #       by the 'grep' functs. Wild cards are allowed.
+
+    # Value:
+    #   Returns a printed list of financial centers.
+
+    # Example:
+    #   > listFinCenter("Europe/*")
+    #    [1] "Europe/Amsterdam"   "Europe/Andorra"     "Europe/Athens"
+    #    [4] "Europe/Belfast"     "Europe/Belgrade"    "Europe/Berlin"
+    #    [7] "Europe/Bratislava"  "Europe/Brussels"    "Europe/Bucharest"
+    #   [10] "Europe/Budapest"    "Europe/Chisinau"    "Europe/Copenhagen"
+    #   [13] "Europe/Dublin"      "Europe/Gibraltar"   "Europe/Helsinki"
+    #   [16] "Europe/Istanbul"    ...
+
+
+    # Check Time Zone:
+    TZ <- Sys.getenv("TZ")
+    if(TZ[[1]] != "GMT") {
+        Sys.setenv(TZ = "GMT")
+        on.exit(Sys.setenv(TZ = TZ))
+    }
+
+    # Load Database:
+    tz = .FinCenterList
+
+    # Financial Centers:
+    if (pattern == "*") pattern = "\\\\*"
+
+    # Return Value:
+    as.character(tz[grep(pattern = pattern, x = tz)])
+}
+
+
+################################################################################
+# VARABLE:                  LIST OF FINANCIAL CENTERS:
+#  .FinCenterList            The list with FinCenter names
+#  .FinCenterListOld         Old list used for testing purposes
+
+.FinCenterList <- c( "Europe/Andorra",
+                    "Asia/Dubai",
+                    "Asia/Kabul",
+                    "America/Antigua",
+                    "America/Anguilla",
+                    "Europe/Tirane",
+                    "Asia/Yerevan",
+                    "America/Curacao",
+                    "Africa/Luanda",
+                    "Antarctica/McMurdo",
+                    "Antarctica/South_Pole",
+                    "Antarctica/Rothera",
+                    "Antarctica/Palmer",
+                    "Antarctica/Mawson",
+                    "Antarctica/Davis",
+                    "Antarctica/Casey",
+                    "Antarctica/Vostok",
+                    "Antarctica/DumontDUrville",
+                    "Antarctica/Syowa",
+                    "America/Argentina/Buenos_Aires",
+                    "America/Argentina/Cordoba",
+                    "America/Argentina/Jujuy",
+                    "America/Argentina/Tucuman",
+                    "America/Argentina/Catamarca",
+                    "America/Argentina/La_Rioja",
+                    "America/Argentina/San_Juan",
+                    "America/Argentina/Mendoza",
+                    "America/Argentina/Rio_Gallegos",
+                    "America/Argentina/Ushuaia",
+                    "Pacific/Pago_Pago",
+                    "Europe/Vienna",
+                    "Australia/Lord_Howe",
+                    "Australia/Hobart",
+                    "Australia/Currie",
+                    "Australia/Melbourne",
+                    "Australia/Sydney",
+                    "Australia/Broken_Hill",
+                    "Australia/Brisbane",
+                    "Australia/Lindeman",
+                    "Australia/Adelaide",
+                    "Australia/Darwin",
+                    "Australia/Perth",
+                    "Australia/Eucla",
+                    "America/Aruba",
+                    "Europe/Mariehamn",
+                    "Asia/Baku",
+                    "Europe/Sarajevo",
+                    "America/Barbados",
+                    "Asia/Dhaka",
+                    "Europe/Brussels",
+                    "Africa/Ouagadougou",
+                    "Europe/Sofia",
+                    "Asia/Bahrain",
+                    "Africa/Bujumbura",
+                    "Africa/Porto-Novo",
+                    "America/St_Barthelemy",
+                    "Atlantic/Bermuda",
+                    "Asia/Brunei",
+                    "America/La_Paz",
+                    "America/Noronha",
+                    "America/Belem",
+                    "America/Fortaleza",
+                    "America/Recife",
+                    "America/Araguaina",
+                    "America/Maceio",
+                    "America/Bahia",
+                    "America/Sao_Paulo",
+                    "America/Campo_Grande",
+                    "America/Cuiaba",
+                    "America/Porto_Velho",
+                    "America/Boa_Vista",
+                    "America/Manaus",
+                    "America/Eirunepe",
+                    "America/Rio_Branco",
+                    "America/Nassau",
+                    "Asia/Thimphu",
+                    "Africa/Gaborone",
+                    "Europe/Minsk",
+                    "America/Belize",
+                    "America/St_Johns",
+                    "America/Halifax",
+                    "America/Glace_Bay",
+                    "America/Moncton",
+                    "America/Goose_Bay",
+                    "America/Blanc-Sablon",
+                    "America/Montreal",
+                    "America/Toronto",
+                    "America/Nipigon",
+                    "America/Thunder_Bay",
+                    "America/Iqaluit",
+                    "America/Pangnirtung",
+                    "America/Resolute",
+                    "America/Atikokan",
+                    "America/Rankin_Inlet",
+                    "America/Winnipeg",
+                    "America/Rainy_River",
+                    "America/Regina",
+                    "America/Swift_Current",
+                    "America/Edmonton",
+                    "America/Cambridge_Bay",
+                    "America/Yellowknife",
+                    "America/Inuvik",
+                    "America/Dawson_Creek",
+                    "America/Vancouver",
+                    "America/Whitehorse",
+                    "America/Dawson",
+                    "Indian/Cocos",
+                    "Africa/Kinshasa",
+                    "Africa/Lubumbashi",
+                    "Africa/Bangui",
+                    "Africa/Brazzaville",
+                    "Europe/Zurich",
+                    "Africa/Abidjan",
+                    "Pacific/Rarotonga",
+                    "America/Santiago",
+                    "Pacific/Easter",
+                    "Africa/Douala",
+                    "Asia/Shanghai",
+                    "Asia/Harbin",
+                    "Asia/Chongqing",
+                    "Asia/Urumqi",
+                    "Asia/Kashgar",
+                    "America/Bogota",
+                    "America/Costa_Rica",
+                    "America/Havana",
+                    "Atlantic/Cape_Verde",
+                    "Indian/Christmas",
+                    "Asia/Nicosia",
+                    "Europe/Prague",
+                    "Europe/Berlin",
+                    "Africa/Djibouti",
+                    "Europe/Copenhagen",
+                    "America/Dominica",
+                    "America/Santo_Domingo",
+                    "Africa/Algiers",
+                    "America/Guayaquil",
+                    "Pacific/Galapagos",
+                    "Europe/Tallinn",
+                    "Africa/Cairo",
+                    "Africa/El_Aaiun",
+                    "Africa/Asmara",
+                    "Europe/Madrid",
+                    "Africa/Ceuta",
+                    "Atlantic/Canary",
+                    "Africa/Addis_Ababa",
+                    "Europe/Helsinki",
+                    "Pacific/Fiji",
+                    "Atlantic/Stanley",
+                    "Pacific/Truk",
+                    "Pacific/Ponape",
+                    "Pacific/Kosrae",
+                    "Atlantic/Faroe",
+                    "Europe/Paris",
+                    "Africa/Libreville",
+                    "Europe/London",
+                    "America/Grenada",
+                    "Asia/Tbilisi",
+                    "America/Cayenne",
+                    "Europe/Guernsey",
+                    "Africa/Accra",
+                    "Europe/Gibraltar",
+                    "America/Godthab",
+                    "America/Danmarkshavn",
+                    "America/Scoresbysund",
+                    "America/Thule",
+                    "Africa/Banjul",
+                    "Africa/Conakry",
+                    "America/Guadeloupe",
+                    "Africa/Malabo",
+                    "Europe/Athens",
+                    "Atlantic/South_Georgia",
+                    "America/Guatemala",
+                    "Pacific/Guam",
+                    "Africa/Bissau",
+                    "America/Guyana",
+                    "Asia/Hong_Kong",
+                    "America/Tegucigalpa",
+                    "Europe/Zagreb",
+                    "America/Port-au-Prince",
+                    "Europe/Budapest",
+                    "Asia/Jakarta",
+                    "Asia/Pontianak",
+                    "Asia/Makassar",
+                    "Asia/Jayapura",
+                    "Europe/Dublin",
+                    "Asia/Jerusalem",
+                    "Europe/Isle_of_Man",
+                    "Asia/Calcutta",
+                    "Indian/Chagos",
+                    "Asia/Baghdad",
+                    "Asia/Tehran",
+                    "Atlantic/Reykjavik",
+                    "Europe/Rome",
+                    "Europe/Jersey",
+                    "America/Jamaica",
+                    "Asia/Amman",
+                    "Asia/Tokyo",
+                    "Africa/Nairobi",
+                    "Asia/Bishkek",
+                    "Asia/Phnom_Penh",
+                    "Pacific/Tarawa",
+                    "Pacific/Enderbury",
+                    "Pacific/Kiritimati",
+                    "Indian/Comoro",
+                    "America/St_Kitts",
+                    "Asia/Pyongyang",
+                    "Asia/Seoul",
+                    "Asia/Kuwait",
+                    "America/Cayman",
+                    "Asia/Almaty",
+                    "Asia/Qyzylorda",
+                    "Asia/Aqtobe",
+                    "Asia/Aqtau",
+                    "Asia/Oral",
+                    "Asia/Vientiane",
+                    "Asia/Beirut",
+                    "America/St_Lucia",
+                    "Europe/Vaduz",
+                    "Asia/Colombo",
+                    "Africa/Monrovia",
+                    "Africa/Maseru",
+                    "Europe/Vilnius",
+                    "Europe/Luxembourg",
+                    "Europe/Riga",
+                    "Africa/Tripoli",
+                    "Africa/Casablanca",
+                    "Europe/Monaco",
+                    "Europe/Chisinau",
+                    "Europe/Podgorica",
+                    "America/Marigot",
+                    "Indian/Antananarivo",
+                    "Pacific/Majuro",
+                    "Pacific/Kwajalein",
+                    "Europe/Skopje",
+                    "Africa/Bamako",
+                    "Asia/Rangoon",
+                    "Asia/Ulaanbaatar",
+                    "Asia/Hovd",
+                    "Asia/Choibalsan",
+                    "Asia/Macau",
+                    "Pacific/Saipan",
+                    "America/Martinique",
+                    "Africa/Nouakchott",
+                    "America/Montserrat",
+                    "Europe/Malta",
+                    "Indian/Mauritius",
+                    "Indian/Maldives",
+                    "Africa/Blantyre",
+                    "America/Mexico_City",
+                    "America/Cancun",
+                    "America/Merida",
+                    "America/Monterrey",
+                    "America/Mazatlan",
+                    "America/Chihuahua",
+                    "America/Hermosillo",
+                    "America/Tijuana",
+                    "Asia/Kuala_Lumpur",
+                    "Asia/Kuching",
+                    "Africa/Maputo",
+                    "Africa/Windhoek",
+                    "Pacific/Noumea",
+                    "Africa/Niamey",
+                    "Pacific/Norfolk",
+                    "Africa/Lagos",
+                    "America/Managua",
+                    "Europe/Amsterdam",
+                    "Europe/Oslo",
+                    "Asia/Katmandu",
+                    "Pacific/Nauru",
+                    "Pacific/Niue",
+                    "Pacific/Auckland",
+                    "Pacific/Chatham",
+                    "Asia/Muscat",
+                    "America/Panama",
+                    "America/Lima",
+                    "Pacific/Tahiti",
+                    "Pacific/Marquesas",
+                    "Pacific/Gambier",
+                    "Pacific/Port_Moresby",
+                    "Asia/Manila",
+                    "Asia/Karachi",
+                    "Europe/Warsaw",
+                    "America/Miquelon",
+                    "Pacific/Pitcairn",
+                    "America/Puerto_Rico",
+                    "Asia/Gaza",
+                    "Europe/Lisbon",
+                    "Atlantic/Madeira",
+                    "Atlantic/Azores",
+                    "Pacific/Palau",
+                    "America/Asuncion",
+                    "Asia/Qatar",
+                    "Indian/Reunion",
+                    "Europe/Bucharest",
+                    "Europe/Belgrade",
+                    "Europe/Kaliningrad",
+                    "Europe/Moscow",
+                    "Europe/Volgograd",
+                    "Europe/Samara",
+                    "Asia/Yekaterinburg",
+                    "Asia/Omsk",
+                    "Asia/Novosibirsk",
+                    "Asia/Krasnoyarsk",
+                    "Asia/Irkutsk",
+                    "Asia/Yakutsk",
+                    "Asia/Vladivostok",
+                    "Asia/Sakhalin",
+                    "Asia/Magadan",
+                    "Asia/Kamchatka",
+                    "Asia/Anadyr",
+                    "Africa/Kigali",
+                    "Asia/Riyadh",
+                    "Pacific/Guadalcanal",
+                    "Indian/Mahe",
+                    "Africa/Khartoum",
+                    "Europe/Stockholm",
+                    "Asia/Singapore",
+                    "Atlantic/St_Helena",
+                    "Europe/Ljubljana",
+                    "Arctic/Longyearbyen",
+                    "Europe/Bratislava",
+                    "Africa/Freetown",
+                    "Europe/San_Marino",
+                    "Africa/Dakar",
+                    "Africa/Mogadishu",
+                    "America/Paramaribo",
+                    "Africa/Sao_Tome",
+                    "America/El_Salvador",
+                    "Asia/Damascus",
+                    "Africa/Mbabane",
+                    "America/Grand_Turk",
+                    "Africa/Ndjamena",
+                    "Indian/Kerguelen",
+                    "Africa/Lome",
+                    "Asia/Bangkok",
+                    "Asia/Dushanbe",
+                    "Pacific/Fakaofo",
+                    "Asia/Dili",
+                    "Asia/Ashgabat",
+                    "Africa/Tunis",
+                    "Pacific/Tongatapu",
+                    "Europe/Istanbul",
+                    "America/Port_of_Spain",
+                    "Pacific/Funafuti",
+                    "Asia/Taipei",
+                    "Africa/Dar_es_Salaam",
+                    "Europe/Kiev",
+                    "Europe/Uzhgorod",
+                    "Europe/Zaporozhye",
+                    "Europe/Simferopol",
+                    "Africa/Kampala",
+                    "Pacific/Johnston",
+                    "Pacific/Midway",
+                    "Pacific/Wake",
+                    "America/New_York",
+                    "America/Detroit",
+                    "America/Kentucky/Louisville",
+                    "America/Kentucky/Monticello",
+                    "America/Indiana/Indianapolis",
+                    "America/Indiana/Vincennes",
+                    "America/Indiana/Knox",
+                    "America/Indiana/Winamac",
+                    "America/Indiana/Marengo",
+                    "America/Indiana/Vevay",
+                    "America/Chicago",
+                    "America/Indiana/Tell_City",
+                    "America/Indiana/Petersburg",
+                    "America/Menominee",
+                    "America/North_Dakota/Center",
+                    "America/North_Dakota/New_Salem",
+                    "America/Denver",
+                    "America/Boise",
+                    "America/Shiprock",
+                    "America/Phoenix",
+                    "America/Los_Angeles",
+                    "America/Anchorage",
+                    "America/Juneau",
+                    "America/Yakutat",
+                    "America/Nome",
+                    "America/Adak",
+                    "Pacific/Honolulu",
+                    "America/Montevideo",
+                    "Asia/Samarkand",
+                    "Asia/Tashkent",
+                    "Europe/Vatican",
+                    "America/St_Vincent",
+                    "America/Caracas",
+                    "America/Tortola",
+                    "America/St_Thomas",
+                    "Asia/Saigon",
+                    "Pacific/Efate",
+                    "Pacific/Wallis",
+                    "Pacific/Apia",
+                    "Asia/Aden",
+                    "Indian/Mayotte",
+                    "Africa/Johannesburg",
+                    "Africa/Lusaka",
+                    "Africa/Harare")
+
+.FinCenterListOld = c(
+    "Africa/Algiers", "Africa/Cairo", "Africa/Casablanca",
+    "Africa/Johannesburg", "Africa/Lagos", "Africa/Nairobi",
+    "Africa/Tunis", "America/Anchorage", "America/Bogota",
+    "America/BuenosAires", "America/Caracas", "America/Cayman",
+    "America/Chicago", "America/Denver", "America/Detroit",
+    "America/Eastern", "America/Edmonton", "America/Indianapolis",
+    "America/LosAngeles", "America/MexicoCity", "America/Montreal",
+    "America/Nassau", "America/NewYork", "America/Pacific",
+    "America/Toronto",
+    "America/Vancouver", "America/Winnipeg", "Asia/Bahrain",
+    "Asia/Bangkok", "Asia/Beirut", "Asia/Calcutta",
+    "Asia/Dubai", "Asia/HongKong", "Asia/Istanbul",
+    "Asia/Jakarta", "Asia/Jerusalem", "Asia/KualaLumpur",
+    "Asia/Kuwait", "Asia/Manila", "Asia/Riyadh",
+    "Asia/Seoul", "Asia/Shanghai", "Asia/Singapore",
+    "Asia/Taipei", "Asia/Tehran", "Asia/Tokyo",
+    "Australia/Adelaide", "Australia/Brisbane", "Australia/Darwin",
+    "Australia/Melbourne", "Australia/Perth", "Australia/Sydney",
+    "Europe/Amsterdam", "Europe/Andorra", "Europe/Athens",
+    "Europe/Belfast", "Europe/Belgrade", "Europe/Berlin",
+    "Europe/Bratislava", "Europe/Brussels", "Europe/Bucharest",
+    "Europe/Budapest", "Europe/Copenhagen", "Europe/Dublin",
+    "Europe/Frankfurt", "Europe/Helsinki", "Europe/Istanbul",
+    "Europe/Kiev", "Europe/Lisbon", "Europe/Ljubljana",
+    "Europe/London", "Europe/Luxembourg", "Europe/Madrid",
+    "Europe/Monaco", "Europe/Moscow", "Europe/Nicosia",
+    "Europe/Oslo", "Europe/Paris", "Europe/Prague",
+    "Europe/Riga", "Europe/Rome", "Europe/Sofia",
+    "Europe/Stockholm", "Europe/Tallinn", "Europe/Tirane",
+    "Europe/Vaduz", "Europe/Vienna", "Europe/Vilnius",
+    "Europe/Warsaw", "Europe/Zagreb", "Europe/Zurich",
+    "Pacific/Auckland", "Pacific/Honolulu")
+
+
+################################################################################

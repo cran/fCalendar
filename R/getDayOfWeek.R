@@ -1,10 +1,10 @@
 
-# Rmetrics is free software; you can redistribute it and/or
+# This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
 # License as published by the Free Software Foundation; either
 # version 2 of the License, or (at your option) any later version.
 #
-# Rmetrics is distributed in the hope that it will be useful,
+# This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
 # GNU Library General Public License for more details.
@@ -16,7 +16,7 @@
 
 # Copyrights (C)
 # for this R-port: 
-#   1999 - 2007, Diethelm Wuertz, GPL
+#   1999 - 2008, Diethelm Wuertz, Rmetrics Foundation, GPL
 #   Diethelm Wuertz <wuertz@itp.phys.ethz.ch>
 #   info@rmetrics.org
 #   www.rmetrics.org
@@ -28,64 +28,65 @@
 
 
 ################################################################################
-# FUNCTION:              FINANCIAL CENTERS:
-#  myFinCenter            Sets my financial center
-#  rulesFinCenter         Returns DST rules for a financial center
-#  listFinCenter          Lists all supported financial centers
+# FUNCTION:                 DESCRIPTION:
+#  getDayOfWeek              Returns the day of the week to a 'timeDate' object
+#  getDayOfYear              Returns the day of the year to a 'timeDate' object
 ################################################################################
 
 
-test.myFinCenter <- 
-    function()
-{
-    # Default Financial Center:
-    # "GMT"
+getDayOfWeek <-
+    function(x)
+{   
+    # A function implemented by Diethelm Wuertz
+
+    # Description:
+    #   Returns day of week for time date objects
     
-    # Financial Center:
-    myFinCenter = "Zurich"
-    print(myFinCenter)
-    current = "Zurich"
-    print(current)
-    checkIdentical(myFinCenter, current)
+    # Arguments:
+    #   x - an object of class "timeDate"
+    
+    # Example:
+    #   weekDay(Sys.timeDate())
+    #   weekDay(timeSequence("2005-05-15", "2005-07-15"))
+    
+    # FUNCTION:
+    
+    # Get Day of Week:
+    wd = c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+    n = as.POSIXlt(x@Data)$wday + 1
+    wdays = wd[n]
+    names(wdays) = as.character(x@Data)
     
     # Return Value:
-    return() 
-}
+    wdays
+}    
 
 
 # ------------------------------------------------------------------------------
- 
 
-test.rulesFinCenter <- 
-    function()
-{
-    # Default Financial Center:
-    # "GMT"
+
+getDayOfYear <- 
+    function(x)
+{   
+    # A function implemented by Diethelm Wuertz
+
+    # Description:
+    #   Returns day of week for time date objects
     
-    # DST Rules for a given Financial Center:
-    rulesFinCenter("Zurich")[59:60, ]
+    # Arguments:
+    #   #   x - an object of class "timeDate"
+     
+    # FUNCTION:
     
-    # Return Value:
-    return() 
-}
-
-
-# ------------------------------------------------------------------------------
- 
-
-test.listFinCenter <- 
-    function()
-{
-    # Default Financial Center:
-    # "GMT"
-    
-    # List of all Financial Centers:
-    listFinCenter()
-    listFinCenter("Europe") 
+    # Assign:
+    yd = 1:366
+    n = as.POSIXlt(x@Data)$yday + 1
+    ydays = yd[n]
+    names(ydays) = as.character(x@Data)
     
     # Return Value:
-    return() 
-}
+    ydays
+}   
 
 
 ################################################################################

@@ -4,6 +4,7 @@
 
 \alias{holidayNYSE}
 \alias{holidayZURICH}
+\alias{holidayTSX}
 
 
 \title{Holiday Calendars}
@@ -19,6 +20,7 @@
 \usage{
 holidayNYSE(year = currentYear)
 holidayZURICH(year = currentYear)
+holidayTSX(year = currentYear)
 }
 
 
@@ -34,7 +36,8 @@ holidayZURICH(year = currentYear)
 \value{
 
     \code{holidayNYSE}\cr
-    \code{holidayZURICH}
+    \code{holidayZURICH}\cr
+    \code{holidayTSX}
     \cr
     return an holiday calendar as an object of class \code{timeDate}. 
 
@@ -75,7 +78,6 @@ ISO-8601 (1988);
    holidayNYSE(currentYear)
    
 ## holidayZURICH =
-   \dontrun{
    holidayZURICH = function(year = currentYear) {
      holidays = c(
         NewYearsDay(year),
@@ -97,11 +99,9 @@ ISO-8601 (1988);
      holidays@FinCenter = "Zurich"
      # Return Value:
      holidays }
-   }
+
    holidayZURICH(2007:2009)
 }
-
-
 
 \keyword{chron}
 
